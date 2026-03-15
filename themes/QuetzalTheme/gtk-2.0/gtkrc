@@ -1,0 +1,33 @@
+# QuetzalTheme — GTK2 — QuetzalOS
+
+gtk-color-scheme = "
+bg_color:#0a0705
+fg_color:#f0e6c8
+base_color:#0d1208
+text_color:#f0e6c8
+selected_bg_color:#1a4a2e
+selected_fg_color:#f0c040
+tooltip_bg_color:#0a0705
+tooltip_fg_color:#c9a227
+"
+
+style "default" {
+  bg[NORMAL] = @bg_color
+  bg[PRELIGHT] = "#1a4a2e"
+  bg[ACTIVE] = "#2d7a4f"
+  bg[SELECTED] = @selected_bg_color
+  bg[INSENSITIVE] = "#1a1208"
+
+  fg[NORMAL] = @fg_color
+  fg[PRELIGHT] = @selected_fg_color
+  fg[ACTIVE] = @selected_fg_color
+  fg[SELECTED] = @selected_fg_color
+  fg[INSENSITIVE] = "#a09070"
+
+  base[NORMAL] = @base_color
+  base[SELECTED] = @selected_bg_color
+  text[NORMAL] = @text_color
+  text[SELECTED] = @selected_fg_color
+}
+
+class "*" style "default"

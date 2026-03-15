@@ -1,0 +1,57 @@
+// QuetzalOS — Animation Plymouth — Pierre du Soleil
+
+Window.SetBackgroundTopColor(0.04, 0.03, 0.02);
+Window.SetBackgroundBottomColor(0.07, 0.10, 0.05);
+
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+cx = screen_width / 2;
+cy = screen_height / 2;
+
+// Cercles concentriques dorés
+for (i = 0; i < 5; i++) {
+    circle[i] = Image(10, 10);
+    circle[i].SetX(cx);
+    circle[i].SetY(cy);
+}
+
+// Texte QuetzalOS
+logo_text = Image.Text("Q U E T Z A L O S", 0.78, 0.64, 0.15);
+logo_sprite = Sprite(logo_text);
+logo_sprite.SetX(cx - logo_text.GetWidth() / 2);
+logo_sprite.SetY(cy + 120);
+logo_sprite.SetOpacity(0);
+
+// Sous-titre
+sub_text = Image.Text("Serpent à Plumes · Système de Sécurité", 0.63, 0.56, 0.35);
+sub_sprite = Sprite(sub_text);
+sub_sprite.SetX(cx - sub_text.GetWidth() / 2);
+sub_sprite.SetY(cy + 150);
+sub_sprite.SetOpacity(0);
+
+// Barre de progression
+progress_bg = Image(400, 4);
+progress_sprite = Sprite(progress_bg);
+progress_sprite.SetX(cx - 200);
+progress_sprite.SetY(cy + 200);
+
+angle = 0;
+progress = 0;
+
+fun refresh_callback() {
+    angle = angle + 2;
+    if (angle >= 360) angle = 0;
+
+    // Rotation symbolique
+    logo_sprite.SetOpacity(Math.Min(1.0, progress * 2));
+    sub_sprite.SetOpacity(Math.Min(0.7, progress * 1.5));
+
+    progress = progress + 0.002;
+}
+
+fun progress_callback(duration, progress_val) {
+    progress = progress_val;
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+Plymouth.SetBootProgressFunction(progress_callback);

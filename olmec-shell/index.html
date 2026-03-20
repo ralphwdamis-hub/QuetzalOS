@@ -916,13 +916,29 @@ this.print(` <span class="tp">${c.label}</span> :<span class="tc">${c.port}</spa
 this.print(` 💡 Pour un scan complet : shodan.io ou nmap (hors navigateur)`, 'ti');
 },
 };
+// Connexion WebSocket au vrai terminal bash
+const ws = new WebSocket('ws://localhost:8765');
+ws.onmessage = function(event) {
+  const out = document.getElementById('tout');
+  const d = document.createElement('div');
+  d.className = 'tl';
+  d.innerHTML = '<span class="to">' + event.data.replace(/</g,'&lt;') + '</span>';
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+};
+
+function sendToTerminal(cmd) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(cmd);
+  }
+}
 // Gestion clavier terminal
 function tKeyDown(e) {
 const inp = document.getElementById('tinput');
 if (e.key === 'Enter') {
 const cmd = inp.value;
 inp.value = '';
-T.run(cmd);
+sendToTerminal(cmd);
 } else if (e.key === 'ArrowUp') {
 e.preventDefault();
 if (T.histIdx < T.history.length - 1) {

@@ -8,8 +8,8 @@ function createWindow() {
     title: 'QuetzalOS',
     backgroundColor: '#0a0705',
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true
+      nodeIntegration: true,
+      contextIsolation: false
     },
     frame: false
   })

@@ -1,0 +1,18 @@
+{
+  "name": "olmec-shell",
+  "version": "1.0.0",
+  "description": "QuetzalOS - Olmec Shell",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . QuetzalOS --platform=linux --arch=x64"
+  },
+  "author": "QuetzalOS",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0"
+  }
+}

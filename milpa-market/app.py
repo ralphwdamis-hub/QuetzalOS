@@ -84,7 +84,14 @@ def passer_commande():
     db.session.add(commande)
     db.session.commit()
     return jsonify({'message': 'Commande reçue', 'id': commande.id})
-
+    
+@app.route('/api/paiement/lien', methods=['POST'])
+def lien_paiement():
+    data = request.json
+    montant = data.get('montant', 0)
+    description = data.get('description', 'Achat Milpa Market')
+    lien = f"https://www.paypal.com/paypalme/MilpaMarket/{montant}"
+    return jsonify({'lien': lien})
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

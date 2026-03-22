@@ -1484,7 +1484,39 @@ produits: [
 init() {
 this.renderFilters();
 this.renderGrid('Tous');
+this.fetchProduitsAPI();
 },
+
+init() {
+  this.renderFilters();
+  this.renderGrid('Tous');
+  this.fetchProduitsAPI();
+},
+
+fetchProduitsAPI() {
+  fetch('http://localhost:5000/api/produits')
+    .then(r => r.json())
+    .then(produits => {
+      if (produits.length > 0) {
+        produits.forEach(p => {
+          if (!this.produits.find(x => x.nom === p.nom_fr)) {
+            this.produits.push({
+              id: 900 + p.id,
+              nom: p.nom_fr,
+              nah: p.nom_nah || '',
+              prix: p.prix,
+              cat: p.categorie || 'Artisanat',
+              ico: '🛒',
+              desc: p.description_fr || ''
+            });
+          }
+        });
+        this.renderGrid(this.activeCat);
+      }
+    })
+    .catch(() => console.log('Serveur Milpa Market hors ligne'));
+},
+
 renderFilters() {
 const cats = ['Tous','Nourriture','Artisanat','Médecine','Guerre','Monnaie'];
 const el = document.getElementById('mfilters');

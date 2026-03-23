@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>QuetzalOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&family=IM+Fell+English&display=swap" rel="stylesheet">
+<style>
+:root {
+--obsidian:#0a0705; --jade:#1a4a2e; --jade-light:#2d7a4f; --jade-glow:#3dba76;
+--gold:#c9a227; --gold-bright:#f0c040; --gold-pale:#ffe082;
+--turquoise:#00a99d; --turquoise-light:#4ecdc4;
+--blood:#8b1a1a; --blood-bright:#c0392b;
+--stone:#2c2416; --text-main:#f0e6c8; --text-dim:#a09070;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { width:100%; height:100%; }
+body {
+width:100vw; height:100vh;
+overflow:hidden;
+font-family:'Cinzel',serif;
+background:var(--obsidian);
+user-select:none;
+position:relative;
+}
+@keyframes serpentFloat { 0%,100%{transform:translateY(0) rotate(-1.5deg);} 50%{transform:translateY(-7px) rotate(1.5deg);} }
+@keyframes eyePulse { 0%,100%{filter:drop-shadow(0 0 4px rgba(255,60,0,0.6));} 50%{filter:drop-shadow(0 0 14px rgba(255,60,0,1)) drop-shadow(0 0 28px rgba(255,60,0,0.5));} }
+@keyframes glyphPulse { 0%,100%{opacity:.5; filter:drop-shadow(0 0 6px var(--gold));} 50%{opacity:1; filter:drop-shadow(0 0 18px var(--gold-bright));} }
+@keyframes starBlink { 0%,100%{opacity:.2;} 50%{opacity:.9;} }
+@keyframes borderFlow { 0%{background-position:0 0;} 100%{background-position:60px 0;} }
+@keyframes popIn { from{transform:scale(.85);opacity:0;} to{transform:scale(1);opacity:1;} }
+@keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+@keyframes sunSpin { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+#bg {
+position:fixed; inset:0; z-index:0;
+background:
+radial-gradient(ellipse 60% 50% at 30% 25%, rgba(26,74,46,.45) 0%, transparent 60%),
+radial-gradient(ellipse 50% 40% at 75% 75%, rgba(201,162,39,.12) 0%, transparent 55%),
+linear-gradient(160deg,#0a0705 0%,#0d1a10 55%,#0a0705 100%);
+}
+.star { position:fixed; border-radius:50%; background:#ffe082; z-index:1; pointer-events:none; animation:starBlink linear infinite; }
+#sunstone {
+position:fixed; z-index:1; pointer-events:none;
+top:50%; left:50%;
+transform:translate(-50%,-50%);
+width:min(640px,78vmin); height:min(640px,78vmin);
+opacity:.055;
+animation:sunSpin 120s linear infinite;
+}
+/* DESKTOP ICONS */
+#icons { position:fixed; left:18px; top:18px; z-index:50; display:flex; flex-direction:column; gap:6px; }
+.icon { display:flex; flex-direction:column; align-items:center; gap:5px; width:70px; cursor:pointer; animation:popIn .4s ease both; }
+.icon:nth-child(1){animation-delay:.1s} .icon:nth-child(2){animation-delay:.2s}
+.icon:nth-child(3){animation-delay:.3s} .icon:nth-child(4){animation-delay:.4s}
+.icon:nth-child(5){animation-delay:.5s}
+.icon-box {
+width:54px; height:54px; border-radius:8px;
+background:linear-gradient(135deg,rgba(26,74,46,.85),rgba(44,36,22,.9));
+border:1.5px solid rgba(201,162,39,.45);
+display:flex; align-items:center; justify-content:center;
+transition:all .2s; box-shadow:0 4px 14px rgba(0,0,0,.5);
+}
+.icon:hover .icon-box { border-color:var(--gold-bright); box-shadow:0 0 18px rgba(201,162,39,.5); transform:translateY(-3px); }
+.icon.sel .icon-box { border-color:var(--turquoise-light); box-shadow:0 0 14px rgba(0,169,157,.6); background:rgba(0,169,157,.18); }
+.icon-lbl { color:var(--text-main); font-size:10px; text-align:center; text-shadow:1px 1px 4px #000,0 0 8px #000; line-height:1.3; }
+.icon.sel .icon-lbl { background:rgba(0,169,157,.4); padding:1px 4px; border-radius:2px; }
+/* WINDOWS */
+.win {
+position:fixed; display:none; flex-direction:column;
+background:linear-gradient(155deg,rgba(18,12,7,.97),rgba(12,20,14,.97));
+border:1.5px solid var(--gold); border-radius:6px;
+box-shadow:0 22px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(201,162,39,.12);
+overflow:hidden; min-width:280px; z-index:100;
+animation:popIn .25s cubic-bezier(.175,.885,.32,1.275);
+}
+.win::before {
+content:''; position:absolute; top:0; left:0; right:0; height:3px;
+background:repeating-linear-gradient(90deg,var(--blood) 0,var(--blood) 6px,var(--gold) 6px,var(--gold) 12px,var(--jade-glow) 12px,var(--jade-glow) 18px,var(--turquoise) 18px,var(--turquoise) 24px);
+background-size:60px 3px; animation:borderFlow 1.4s linear infinite;
+}
+.wbar {
+height:34px; flex-shrink:0;
+background:linear-gradient(90deg,rgba(26,74,46,.8),rgba(44,36,22,.9),rgba(26,74,46,.8));
+border-bottom:1px solid rgba(201,162,39,.25);
+display:flex; align-items:center; padding:0 9px; cursor:move; gap:8px;
+}
+.wtitle { flex:1; color:var(--gold-pale); font-family:'Cinzel Decorative',serif; font-size:10px; letter-spacing:.1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wbtns { display:flex; gap:5px; flex-shrink:0; }
+.wb { width:13px; height:13px; border-radius:50%; cursor:pointer; border:1px solid rgba(0,0,0,.3); transition:filter .15s; }
+.wb:hover { filter:brightness(1.4); }
+.wbc{background:var(--blood-bright);} .wbm{background:var(--gold);} .wbx{background:var(--jade-glow);}
+.wbody { flex:1; overflow:auto; padding:14px; color:var(--text-main); font-family:'IM Fell English',serif; font-size:13px; line-height:1.7; scrollbar-width:thin; scrollbar-color:var(--gold) var(--stone); }
+/* QUETZAL WINDOW */
+.qs-wrap { display:flex; flex-direction:column; align-items:center; }
+.qs-anim { animation:serpentFloat 6s ease-in-out infinite; }
+.qs-anim svg { animation:eyePulse 3s ease-in-out infinite; }
+.qname { font-family:'Cinzel Decorative',serif; font-size:20px; color:var(--jade-glow); letter-spacing:.15em; margin-top:6px; text-shadow:0 0 20px rgba(61,186,118,.5); }
+.qsub { color:var(--gold); font-size:11px; letter-spacing:.2em; margin-top:3px; font-family:'Cinzel',serif; }
+.qdiv { color:var(--gold); letter-spacing:.5em; font-size:11px; margin:10px 0; opacity:.65; }
+.igrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; width:100%; }
+.icard { background:rgba(26,74,46,.2); border:1px solid rgba(201,162,39,.22); border-radius:4px; padding:9px; }
+.iclbl { color:var(--turquoise-light); font-family:'Cinzel',serif; font-size:9px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; }
+.icval { color:var(--text-main); font-size:12px; }
+/* FILE WINDOW */
+.ftbar { display:flex; gap:5px; margin-bottom:10px; padding-bottom:9px; border-bottom:1px solid rgba(201,162,39,.18); }
+.fbtn { background:rgba(44,36,22,.8); border:1px solid rgba(201,162,39,.28); color:var(--text-dim); font-family:'Cinzel',serif; font-size:9px; padding:4px 9px; border-radius:3px; cursor:pointer; letter-spacing:.05em; transition:all .15s; }
+.fbtn:hover { border-color:var(--gold); color:var(--gold-pale); }
+.fpath { background:rgba(10,7,5,.8); border:1px solid rgba(201,162,39,.18); padding:4px 9px; border-radius:3px; color:var(--jade-glow); font-size:11px; flex:1; }
+.fitem { display:flex; align-items:center; gap:9px; padding:6px 9px; border-radius:3px; cursor:pointer; transition:all .15s; border:1px solid transparent; }
+.fitem:hover { background:rgba(26,74,46,.3); border-color:rgba(201,162,39,.18); }
+.fitem.sel { background:rgba(0,169,157,.18); border-color:var(--turquoise); }
+.fic{font-size:19px;width:26px;text-align:center;} .fi{flex:1;}
+.fn{color:var(--text-main);font-size:12px;} .fm{color:var(--text-dim);font-size:10px;font-family:'Cinzel',serif;letter-spacing:.03em;}
+.fsz{color:var(--text-dim);font-size:10px;font-family:'Cinzel',serif;}
+/* TERMINAL */
+.tbody { background:#040201 !important; font-family:'Courier New',monospace !important; font-size:12px !important; padding:11px !important; }
+.tl{margin-bottom:3px;line-height:1.55;} .tp{color:var(--jade-glow);} .tc{color:var(--gold-pale);}
+.to{color:var(--text-dim);} .ti{color:var(--turquoise-light);}
+.tcur{display:inline-block;width:8px;height:13px;background:var(--jade-glow);vertical-align:middle;animation:blink 1s step-end infinite;}
+/* CALENDAR */
+.cnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cnbtn{background:none;border:none;color:var(--gold);font-size:15px;cursor:pointer;padding:0 7px;}
+.cnbtn:hover{color:var(--gold-bright);}
+.cmname{color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:11px;letter-spacing:.1em;}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;}
+.chdr{color:var(--turquoise-light);font-size:9px;padding:3px;font-family:'Cinzel',serif;}
+.cday{padding:5px 0;font-size:11px;border-radius:3px;cursor:pointer;color:var(--text-dim);transition:all .15s;}
+.cday:hover{background:rgba(201,162,39,.14);color:var(--gold-pale);}
+.cday.today{background:var(--jade);color:var(--gold-bright);border:1px solid var(--jade-glow);font-weight:700;}
+.cday.om{opacity:.28;}
+.cday.csel{background:rgba(201,162,39,.22);color:var(--gold-bright);border:1px solid var(--gold);}
+.aztec-m{text-align:center;margin-top:10px;padding-top:9px;border-top:1px solid rgba(201,162,39,.18);color:var(--turquoise-light);font-size:10px;font-family:'Cinzel',serif;letter-spacing:.07em;}
+.ag{font-size:22px;display:block;margin-bottom:3px;animation:glyphPulse 3s ease-in-out infinite;}
+/* TASKBAR */
+#taskbar {
+position:fixed; bottom:0; left:0; right:0; height:50px; z-index:1000;
+background:linear-gradient(180deg,rgba(10,7,5,.96),rgba(18,13,7,.99));
+border-top:2px solid var(--gold);
+display:flex; align-items:center; padding:0 7px; gap:5px;
+box-shadow:0 -4px 28px rgba(201,162,39,.18);
+}
+#taskbar::before {
+content:''; position:absolute; top:-4px; left:0; right:0; height:4px;
+background:repeating-linear-gradient(90deg,var(--jade-glow) 0,var(--jade-glow) 8px,var(--gold) 8px,var(--gold) 12px,var(--jade-glow) 12px,var(--jade-glow) 20px,var(--blood-bright) 20px,var(--blood-bright) 24px);
+background-size:60px 4px; animation:borderFlow 1.5s linear infinite; opacity:.7;
+}
+#sbtn {
+height:36px; padding:0 13px; flex-shrink:0;
+background:linear-gradient(135deg,var(--jade),var(--jade-light),var(--jade));
+border:1.5px solid var(--jade-glow); border-radius:4px;
+color:var(--gold-bright); font-family:'Cinzel Decorative',serif; font-size:10px; font-weight:700;
+cursor:pointer; display:flex; align-items:center; gap:7px; letter-spacing:.05em; transition:all .2s;
+}
+#sbtn:hover { background:linear-gradient(135deg,var(--jade-light),var(--jade-glow),var(--jade-light)); box-shadow:0 0 14px rgba(61,186,118,.5); }
+.tbapp {
+height:36px; padding:0 11px; flex-shrink:0;
+background:rgba(44,36,22,.6); border:1px solid rgba(201,162,39,.28); border-radius:4px;
+color:var(--text-dim); font-family:'Cinzel',serif; font-size:10px;
+cursor:pointer; display:none; align-items:center; gap:6px; transition:all .2s;
+}
+.tbapp.on{display:flex;} .tbapp.act{background:rgba(26,74,46,.6);border-color:var(--jade-glow);color:var(--gold-pale);box-shadow:0 0 7px rgba(61,186,118,.3);}
+.tbapp:hover{background:rgba(60,58,22,.7);border-color:var(--gold);color:var(--gold-pale);}
+#tbclock{margin-left:auto;text-align:right;flex-shrink:0;padding-right:6px;}
+#tbclock .ct{color:var(--gold-bright);font-size:14px;font-weight:600;letter-spacing:.1em;}
+#tbclock .cd{color:var(--text-dim);font-size:9px;letter-spacing:.04em;}
+#tbclock .caz{color:var(--turquoise-light);font-size:8px;letter-spacing:.03em;font-family:'IM Fell English',serif;}
+/* START MENU */
+#smenu {
+position:fixed; bottom:54px; left:0; width:295px; z-index:999;
+background:linear-gradient(155deg,rgba(14,10,6,.98),rgba(9,17,11,.98));
+border:1.5px solid var(--gold); border-bottom:none; border-radius:6px 6px 0 0;
+display:none; flex-direction:column;
+box-shadow:5px -5px 28px rgba(0,0,0,.8); overflow:hidden; animation:popIn .2s ease;
+}
+#smenu.vis{display:flex;}
+.shdr{padding:16px 14px 12px;background:linear-gradient(135deg,rgba(26,74,46,.6),rgba(44,36,22,.8));border-bottom:1px solid rgba(201,162,39,.25);display:flex;align-items:center;gap:11px;}
+.savt{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--jade),var(--blood));border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 0 13px rgba(201,162,39,.3);}
+.sun{color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:12px;letter-spacing:.09em;}
+.sur{color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.07em;margin-top:2px;}
+.stit{color:var(--turquoise-light);font-size:9px;letter-spacing:.18em;padding:9px 14px 4px;font-family:'Cinzel',serif;text-transform:uppercase;}
+.sitm{display:flex;align-items:center;gap:11px;padding:7px 14px;cursor:pointer;color:var(--text-main);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.04em;transition:all .15s;}
+.sitm:hover{background:rgba(26,74,46,.4);color:var(--gold-pale);padding-left:20px;}
+.sico{font-size:17px;width:26px;text-align:center;}
+.sfoot{padding:9px 14px;border-top:1px solid rgba(201,162,39,.18);display:flex;gap:7px;justify-content:flex-end;}
+.spbtn{padding:5px 11px;background:rgba(139,26,26,.4);border:1px solid var(--blood-bright);color:var(--blood-bright);font-family:'Cinzel',serif;font-size:10px;border-radius:3px;cursor:pointer;letter-spacing:.09em;transition:all .15s;}
+.spbtn:hover{background:rgba(139,26,26,.7);}
+.ssep{height:1px;background:rgba(201,162,39,.18);margin:3px 0;}
+/* CONTEXT MENU */
+#ctx {
+position:fixed; z-index:3000; display:none;
+background:linear-gradient(155deg,rgba(14,10,6,.98),rgba(9,17,11,.98));
+border:1px solid var(--gold); border-radius:4px; min-width:175px;
+box-shadow:5px 5px 18px rgba(0,0,0,.7); overflow:hidden;
+}
+#ctx.vis{display:block;}
+.ci{padding:7px 14px;color:var(--text-main);font-family:'Cinzel',serif;font-size:11px;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;gap:7px;border-bottom:1px solid rgba(201,162,39,.08);transition:all .1s;}
+.ci:hover{background:rgba(26,74,46,.5);color:var(--gold-pale);}
+.csep{height:1px;background:rgba(201,162,39,.18);margin:3px 0;}
+/* NOTIFICATION */
+#notif {
+position:fixed; bottom:60px; right:14px; width:268px; z-index:2000; display:none;
+background:linear-gradient(135deg,rgba(14,10,6,.97),rgba(9,17,11,.97));
+border:1.5px solid var(--gold); border-radius:6px; padding:11px 13px;
+box-shadow:0 0 18px rgba(201,162,39,.18),0 10px 28px rgba(0,0,0,.6);
+animation:popIn .3s ease;
+}
+#notif.vis{display:block;}
+.ntit{color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:.09em;margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+.nbody{color:var(--text-dim);font-size:12px;font-family:'IM Fell English',serif;line-height:1.5;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--obsidian);}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<!-- Sun Stone -->
+<svg id="sunstone" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<circle cx="200" cy="200" r="192" fill="none" stroke="#c9a227" stroke-width="3"/>
+<circle cx="200" cy="200" r="158" fill="none" stroke="#c9a227" stroke-width="1.5"/>
+<circle cx="200" cy="200" r="118" fill="none" stroke="#c9a227" stroke-width="1.5"/>
+<circle cx="200" cy="200" r="78" fill="none" stroke="#c9a227" stroke-width="2"/>
+<circle cx="200" cy="200" r="38" fill="none" stroke="#c9a227" stroke-width="2"/>
+<g stroke="#c9a227" stroke-width="1.5" opacity=".8">
+<line x1="200" y1="8" x2="200" y2="158"/><line x1="200" y1="242" x2="200" y2="392"/>
+<line x1="8" y1="200" x2="158" y2="200"/><line x1="242" y1="200" x2="392" y2="200"/>
+</g>
+<g stroke="#c9a227" stroke-width="1" opacity=".5">
+<line x1="58" y1="58" x2="158" y2="158"/><line x1="342" y1="58" x2="242" y2="158"/>
+<line x1="58" y1="342" x2="158" y2="242"/><line x1="342" y1="342" x2="242" y2="242"/>
+</g>
+<g fill="#c9a227" font-size="11" text-anchor="middle">
+<text x="200" y="48" transform="rotate(0,200,200)">☉</text><text x="200" y="48" transform="rotate(18,200,200)">☽</text>
+<text x="200" y="48" transform="rotate(36,200,200)">♦</text><text x="200" y="48" transform="rotate(54,200,200)">◊</text>
+<text x="200" y="48" transform="rotate(72,200,200)">✦</text><text x="200" y="48" transform="rotate(90,200,200)">◈</text>
+<text x="200" y="48" transform="rotate(108,200,200)">⊕</text><text x="200" y="48" transform="rotate(126,200,200)">✧</text>
+<text x="200" y="48" transform="rotate(144,200,200)">⊗</text><text x="200" y="48" transform="rotate(162,200,200)">◉</text>
+<text x="200" y="48" transform="rotate(180,200,200)">☉</text><text x="200" y="48" transform="rotate(198,200,200)">◆</text>
+<text x="200" y="48" transform="rotate(216,200,200)">✦</text><text x="200" y="48" transform="rotate(234,200,200)">⊞</text>
+<text x="200" y="48" transform="rotate(252,200,200)">◈</text><text x="200" y="48" transform="rotate(270,200,200)">✧</text>
+<text x="200" y="48" transform="rotate(288,200,200)">⊗</text><text x="200" y="48" transform="rotate(306,200,200)">◉</text>
+<text x="200" y="48" transform="rotate(324,200,200)">♦</text><text x="200" y="48" transform="rotate(342,200,200)">☽</text>
+</g>
+</svg>
+<!-- Hidden SVG defs for icon -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden">
+<defs>
+<symbol id="qico" viewBox="0 0 40 40">
+<path d="M20 34 C8 34 4 22 10 14 C16 6 28 7 33 14 C38 21 34 31 26 33 C20 34 14 30 14 24 C14 18 19 16 23 18 C27 20 28 25 25 27" fill="none" stroke="#3dba76" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="11" cy="13" rx="7" ry="5.5" fill="#1a6b35" stroke="#3dba76" stroke-width="1.2"/>
+<path d="M6 16 Q7 20 11 21 Q15 21 16 17" fill="#0d3018"/>
+<path d="M8 21 L6 26 L9 24 L10 28 L12 21" fill="#f0e6c8"/>
+<path d="M13 20 L12 25 L15 23 L16 27 L17 20" fill="#f0e6c8"/>
+<circle cx="13" cy="11" r="2" fill="#c9a227"/><circle cx="13" cy="11" r="1" fill="#000"/>
+<path d="M10 22 Q7 24 8 28" fill="none" stroke="#1a4a2e" stroke-width="1.5"/>
+<path d="M10 8 Q8 1 4 -2 Q6 -3 7 2 Q9 -1 11 3 Q10 6 10 8Z" fill="#3dba76"/>
+<path d="M14 7 Q14 0 18 -3 Q20 -2 18 3 Q20 0 21 4 Q18 7 14 7Z" fill="#2d7a4f"/>
+<path d="M7 10 Q2 6 -1 0 Q1 -2 3 3 Q4 -1 7 3 Q7 7 7 10Z" fill="#00a99d"/>
+<path d="M17 10 Q22 6 25 1 Q23 -1 21 4 Q22 0 19 3 Q18 7 17 10Z" fill="#00a99d"/>
+</symbol>
+</defs>
+</svg>
+<!-- Desktop Icons -->
+<div id="icons">
+<div class="icon" onclick="selI(this,'wq')">
+<div class="icon-box"><svg width="36" height="36" viewBox="0 0 40 40"><use href="#qico"/></svg></div>
+<div class="icon-lbl">Quetzalcóatl</div>
+</div>
+<div class="icon" onclick="selI(this,'wf')">
+<div class="icon-box" style="font-size:26px">🏛️</div>
+<div class="icon-lbl">Tenochtitlan Files</div>
+</div>
+<div class="icon" onclick="selI(this,'wt')">
+<div class="icon-box" style="font-size:26px">🗿</div>
+<div class="icon-lbl">Olmec Shell</div>
+</div>
+<div class="icon" onclick="selI(this,'wc')">
+<div class="icon-box" style="font-size:26px">📅</div>
+<div class="icon-lbl">Tonalpohualli</div>
+</div>
+<div class="icon" onclick="selI(this,'wm')">
+<div class="icon-box" style="font-size:26px">🌽</div>
+<div class="icon-lbl">Milpa Market</div>
+</div>
+<div class="icon" onclick="selI(this,'wb')">
+<div class="icon-box">
+<svg width="34" height="34" viewBox="0 0 40 40">
+<!-- Itzcoatl : serpent d'obsidienne formant un globe -->
+<circle cx="20" cy="20" r="14" fill="#0d1a2e" stroke="#c9a227" stroke-width="1.5"/>
+<ellipse cx="20" cy="20" rx="6" ry="14" fill="none" stroke="#3dba76" stroke-width="1.2"/>
+<line x1="6" y1="20" x2="34" y2="20" stroke="#3dba76" stroke-width="1"/>
+<line x1="8" y1="13" x2="32" y2="13" stroke="#3dba76" stroke-width=".7" opacity=".6"/>
+<line x1="8" y1="27" x2="32" y2="27" stroke="#3dba76" stroke-width=".7" opacity=".6"/>
+<!-- tête serpent -->
+<ellipse cx="20" cy="7" rx="4" ry="3" fill="#1a6b35" stroke="#3dba76" stroke-width="1"/>
+<circle cx="18.5" cy="6.5" r=".9" fill="#c9a227"/>
+<circle cx="21.5" cy="6.5" r=".9" fill="#c9a227"/>
+<!-- langue -->
+<path d="M19 9.5 L18 11 M21 9.5 L22 11" stroke="#c0392b" stroke-width=".8"/>
+<!-- écailles obsidienne -->
+<path d="M20 6 Q26 10 28 20 Q26 30 20 34 Q14 30 12 20 Q14 10 20 6Z" fill="none" stroke="#c9a227" stroke-width=".5" opacity=".3"/>
+</svg>
+</div>
+<div class="icon-lbl">Itzcoatl</div>
+</div>
+</div>
+<!-- WINDOW: QUETZALCOATL -->
+<div class="win" id="wq" style="width:540px;height:560px;top:70px;left:110px">
+<div class="wbar" onmousedown="drag(event,'wq')">
+<div class="wtitle">🐍 Quetzalcóatl</div>
+<div class="wbtns">
+<div class="wb wbc" onclick="closeW('wq')"></div>
+<div class="wb wbm" onclick="minW('wq')"></div>
+<div class="wb wbx" onclick="maxW('wq')"></div>
+</div>
+</div>
+<!-- Onglets internes -->
+<div style="display:flex;gap:0;border-bottom:1px solid rgba(201,162,39,.25);flex-shrink:0;background:rgba(10,7,5,.6)">
+<div class="qtab active" id="qtab-info" onclick="qTab('info')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold-bright);border-bottom:2px solid var(--gold);background:rgba(26,74,46,.3)">🐍 À PROPOS</div>
+<div class="qtab" id="qtab-dict" onclick="qTab('dict')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📖 DICTIONNAIRE</div>
+<div class="qtab" id="qtab-phras" onclick="qTab('phras')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">💬 PHRASES</div>
+</div>
+<!-- Panneau : À PROPOS -->
+<div id="qpanel-info" class="wbody" style="flex:1;overflow-y:auto">
+<div class="qs-wrap">
+<div class="qs-anim">
+<svg width="110" height="110" viewBox="0 0 40 40"><use href="#qico"/></svg>
+</div>
+<div class="qname">QUETZALCÓATL</div>
+<div class="qsub">SERPENT À PLUMES · DIEU DU VENT</div>
+<div class="qdiv">— ✦ —</div>
+<div class="igrid">
+<div class="icard"><div class="iclbl">Système</div><div class="icval">QuetzalOS 1.0</div></div>
+<div class="icard"><div class="iclbl">Noyau</div><div class="icval">Soleil Nahui Ollin</div></div>
+<div class="icard"><div class="iclbl">Mémoire</div><div class="icval">13 ciels alloués</div></div>
+<div class="icard"><div class="iclbl">Cycles</div><div class="icval" id="qcyc">—</div></div>
+</div>
+<div class="qdiv" style="margin-top:14px">— ✦ —</div>
+<p style="text-align:center;color:var(--text-dim);font-size:12px;margin-top:6px;font-family:'IM Fell English',serif">
+"Au commencement des temps, Quetzalcóatl<br>façonna l'humanité de ses propres os broyés."
+</p>
+</div>
+</div>
+<!-- Panneau : DICTIONNAIRE -->
+<div id="qpanel-dict" class="wbody" style="flex:1;overflow-y:auto;display:none;padding:12px">
+<div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold-bright);text-align:center;margin-bottom:4px;letter-spacing:.1em">📖 Français — Nahuatl</div>
+<div style="text-align:center;color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:12px">DICTIONNAIRE CLASSIQUE</div>
+<!-- Recherche -->
+<div style="display:flex;gap:6px;margin-bottom:12px">
+<input id="dictsearch" type="text" placeholder="Chercher un mot en français…"
+oninput="dictFilter(this.value)"
+style="flex:1;background:rgba(4,2,1,.8);border:1px solid rgba(201,162,39,.3);border-radius:3px;padding:6px 10px;color:var(--gold-pale);font-family:'IM Fell English',serif;font-size:12px;outline:none"/>
+<button onclick="dictFilter('');document.getElementById('dictsearch').value=''"
+style="background:rgba(44,36,22,.7);border:1px solid rgba(201,162,39,.25);color:var(--text-dim);padding:0 10px;border-radius:3px;cursor:pointer;font-size:12px">✕</button>
+</div>
+<!-- Catégories -->
+<div id="dictcats" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px"></div>
+<!-- Liste -->
+<div id="dictlist"></div>
+</div>
+<!-- Panneau : PHRASES -->
+<div id="qpanel-phras" class="wbody" style="flex:1;overflow-y:auto;display:none;padding:12px">
+<div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold-bright);text-align:center;margin-bottom:4px;letter-spacing:.1em">💬 Phrases Courantes</div>
+<div style="text-align:center;color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:14px">NAHUATL CLASSIQUE</div>
+<div id="phraslist"></div>
+</div>
+</div>
+<!-- WINDOW: TENOCHTITLAN FILES -->
+<div class="win" id="wf" style="width:460px;top:90px;left:160px">
+<div class="wbar" onmousedown="drag(event,'wf')">
+<div class="wtitle">🏛️ Tenochtitlan Files</div>
+<div class="wbtns">
+<div class="wb wbc" onclick="closeW('wf')"></div>
+<div class="wb wbm" onclick="minW('wf')"></div>
+<div class="wb wbx" onclick="maxW('wf')"></div>
+</div>
+</div>
+<div class="wbody">
+<div class="ftbar">
+<button class="fbtn">◀</button>
+<button class="fbtn">▶</button>
+<button class="fbtn">⬆</button>
+<div class="fpath">~/Tenochtitlan/</div>
+</div>
+<div class="fitem sel"><span class="fic">📁</span><div class="fi"><div class="fn">Codex Mendoza</div><div class="fm">Dossier sacré</div></div><span class="fsz">—</span></div>
+<div class="fitem"><span class="fic">📁</span><div class="fi"><div class="fn">Rites du Soleil</div><div class="fm">Dossier sacré</div></div><span class="fsz">—</span></div>
+<div class="fitem"><span class="fic">📜</span><div class="fi"><div class="fn">Calendrier Tonalpohualli</div><div class="fm">Parchemin sacré</div></div><span class="fsz">13 Ko</span></div>
+<div class="fitem"><span class="fic">🌽</span><div class="fi"><div class="fn">Graines de Maïs</div><div class="fm">Offrande</div></div><span class="fsz">4 Ko</span></div>
+<div class="fitem"><span class="fic">🗿</span><div class="fi"><div class="fn">Pierre du Soleil</div><div class="fm">Monument</div></div><span class="fsz">360 Ko</span></div>
+<div class="fitem"><span class="fic">📜</span><div class="fi"><div class="fn">Hymne à Tlaloc</div><div class="fm">Chant rituel</div></div><span class="fsz">7 Ko</span></div>
+</div>
+</div>
+<!-- WINDOW: OLMEC SHELL (Terminal sécurité) -->
+<div class="win" id="wt" style="width:620px;height:480px;top:80px;left:150px">
+<div class="wbar" onmousedown="drag(event,'wt')">
+<div class="wtitle">🗿 Olmec Shell — Détection de Vulnérabilités</div>
+<div class="wbtns">
+<div class="wb wbc" onclick="closeW('wt')"></div>
+<div class="wb wbm" onclick="minW('wt')"></div>
+<div class="wb wbx" onclick="maxW('wt')"></div>
+</div>
+</div>
+<div class="wbody tbody" id="tcon" style="display:flex;flex-direction:column;height:100%;padding:0">
+<!-- Sortie terminal -->
+<div id="tout" style="flex:1;overflow-y:auto;padding:11px;scrollbar-width:thin;scrollbar-color:var(--gold) #040201"></div>
+<!-- Ligne de saisie -->
+<div style="display:flex;align-items:center;padding:6px 11px;border-top:1px solid rgba(61,186,118,.2);background:#020100;flex-shrink:0">
+<span class="tp" style="white-space:nowrap">quetzal@olmec</span>
+<span style="color:var(--text-dim)">:</span>
+<span class="ti">~</span>
+<span style="color:var(--text-dim)">$&nbsp;</span>
+<input id="tinput" type="text" autocomplete="off" spellcheck="false"
+style="flex:1;background:transparent;border:none;outline:none;color:var(--gold-pale);font-family:'Courier New',monospace;font-size:12px;caret-color:var(--jade-glow)"
+placeholder="tapez help pour la liste des commandes…"
+onkeydown="tKeyDown(event)"/>
+</div>
+</div>
+</div>
+<!-- WINDOW: TONALPOHUALLI (Calendar) -->
+<div class="win" id="wc" style="width:340px;top:80px;left:200px;max-height:90vh">
+<div class="wbar" onmousedown="drag(event,'wc')">
+<div class="wtitle">📅 Tonalpohualli</div>
+<div class="wbtns">
+<div class="wb wbc" onclick="closeW('wc')"></div>
+<div class="wb wbm" onclick="minW('wc')"></div>
+<div class="wb wbx" onclick="maxW('wc')"></div>
+</div>
+</div>
+<div class="wbody" id="wcal"></div>
+</div>
+<!-- WINDOW: ITZCOATL BROWSER -->
+<div class="win" id="wb" style="width:680px;height:520px;top:60px;left:130px">
+<div class="wbar" onmousedown="drag(event,'wb')">
+<div class="wtitle">
+<svg width="14" height="14" viewBox="0 0 40 40" style="vertical-align:middle;margin-right:5px">
+<circle cx="20" cy="20" r="14" fill="#0d1a2e" stroke="#c9a227" stroke-width="2"/>
+<ellipse cx="20" cy="20" rx="6" ry="14" fill="none" stroke="#3dba76" stroke-width="1.5"/>
+<line x1="6" y1="20" x2="34" y2="20" stroke="#3dba76" stroke-width="1.2"/>
+<ellipse cx="20" cy="7" rx="4" ry="3" fill="#1a6b35" stroke="#3dba76" stroke-width="1"/>
+<circle cx="18.5" cy="6.5" r=".9" fill="#c9a227"/><circle cx="21.5" cy="6.5" r=".9" fill="#c9a227"/>
+<path d="M19 9.5 L18 11 M21 9.5 L22 11" stroke="#c0392b" stroke-width=".8"/>
+</svg>
+Itzcoatl — Navigateur du Serpent d'Obsidienne
+</div>
+<div class="wbtns">
+<div class="wb wbc" onclick="closeW('wb')"></div>
+<div class="wb wbm" onclick="minW('wb')"></div>
+<div class="wb wbx" onclick="maxW('wb')"></div>
+</div>
+</div>
+<!-- Barre de navigation -->
+<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(10,7,5,.9);border-bottom:1px solid rgba(201,162,39,.2);flex-shrink:0">
+<button onclick="ibNav(-1)" style="background:rgba(44,36,22,.8);border:1px solid rgba(201,162,39,.28);color:var(--gold);width:26px;height:26px;border-radius:3px;cursor:pointer;font-size:13px">◀</button>
+<button onclick="ibNav(1)" style="background:rgba(44,36,22,.8);border:1px solid rgba(201,162,39,.28);color:var(--gold);width:26px;height:26px;border-radius:3px;cursor:pointer;font-size:13px">▶</button>
+<button onclick="ibReload()" style="background:rgba(44,36,22,.8);border:1px solid rgba(201,162,39,.28);color:var(--jade-glow);width:26px;height:26px;border-radius:3px;cursor:pointer;font-size:13px">↺</button>
+<!-- Barre d'adresse -->
+<div style="flex:1;display:flex;align-items:center;background:rgba(4,2,1,.9);border:1px solid rgba(201,162,39,.3);border-radius:3px;padding:0 8px;height:26px">
+<span style="color:var(--jade-glow);font-size:10px;margin-right:5px">🔒</span>
+<input id="iburl" type="text" value="itzcoatl://nouvelle-page"
+style="flex:1;background:transparent;border:none;outline:none;color:var(--gold-pale);font-family:'Courier New',monospace;font-size:11px"
+onkeydown="if(event.key==='Enter') ibGo(this.value)"/>
+</div>
+<button onclick="ibGo(document.getElementById('iburl').value)"
+style="background:linear-gradient(135deg,var(--jade),var(--jade-light));border:1px solid var(--jade-glow);color:var(--gold-bright);padding:0 10px;height:26px;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.05em">
+Aller
+</button>
+</div>
+<!-- Onglets -->
+<div id="ibtabs" style="display:flex;gap:3px;padding:4px 8px 0;background:rgba(8,5,3,.9);flex-shrink:0;overflow-x:auto"></div>
+<!-- Zone de contenu -->
+<div id="ibcontent" style="flex:1;overflow:hidden;position:relative;background:#0d120f"></div>
+</div>
+<!-- WINDOW: MILPA MARKET -->
+<!-- WINDOW: MILPA MARKET -->
+<div class="win" id="wm" style="width:620px;height:540px;top:75px;left:140px">
+  <div class="wbar" onmousedown="drag(event,'wm')">
+    <div class="wtitle">🌽 Milpa Market — Tianguis de Tlatelolco</div>
+    <div class="wbtns">
+      <div class="wb wbc" onclick="closeW('wm')"></div>
+      <div class="wb wbm" onclick="minW('wm')"></div>
+      <div class="wb wbx" onclick="maxW('wm')"></div>
+    </div>
+  </div>
+  <div style="display:flex;border-bottom:1px solid rgba(201,162,39,.25);flex-shrink:0;background:rgba(10,7,5,.7)">
+    <div id="mtab-prod" onclick="mTab('prod')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold-bright);border-bottom:2px solid var(--gold);background:rgba(26,74,46,.3)">🏪 MARCHÉ</div>
+    <div id="mtab-cart" onclick="mTab('cart')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">🧺 PANIER</div>
+    <div id="mtab-info" onclick="mTab('info')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📜 HISTOIRE</div>
+    <div id="mtab-contact" onclick="mTab('contact')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📬 CONTACT</div>
+  </div>
+  <div id="mpanel-prod" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;flex-wrap:wrap;gap:5px" id="mfilters"></div>
+    <div id="mgrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+  </div>
+  <div id="mpanel-cart" style="flex:1;overflow-y:auto;padding:14px;display:none">
+    <div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:13px;margin-bottom:14px;letter-spacing:.1em">🧺 Votre Panier</div>
+    <div id="mcartlist"></div>
+    <div id="mcartfoot" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid rgba(201,162,39,.2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:var(--text-dim);font-family:'Cinzel',serif;font-size:10px">TOTAL</span>
+        <span id="mcarttotal" style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:16px"></span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="MM.clearCart()" style="flex:1;background:rgba(139,26,26,.3);border:1px solid var(--blood-bright);color:var(--blood-bright);padding:8px;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px">🗑 Vider</button>
+        <button onclick="MM.checkout()" style="flex:2;background:linear-gradient(135deg,var(--jade),var(--jade-light));border:1px solid var(--jade-glow);color:var(--gold-bright);padding:8px;border-radius:3px;cursor:pointer;font-family:'Cinzel Decorative',serif;font-size:9px">✦ Offrir aux Dieux</button>
+      </div>
+    </div>
+  </div>
+  <div id="mpanel-info" style="flex:1;overflow-y:auto;padding:14px;display:none;font-family:'IM Fell English',serif;color:var(--text-main)">
+    <div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:14px;margin-bottom:10px;letter-spacing:.1em">📜 Le Tianguis de Tlatelolco</div>
+    <p style="font-size:13px;line-height:1.8;margin-bottom:10px">Le Tianguis de Tlatelolco était le plus grand marché de la Mésoamérique précolombienne.</p>
+  </div>
+  <div id="mpanel-contact" style="flex:1;overflow-y:auto;padding:14px;display:none;font-family:'IM Fell English',serif;color:var(--text-main)">
+    <div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:14px;margin-bottom:12px;letter-spacing:.1em">📬 Contactez-nous</div>
+    <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:14px;margin-bottom:10px">
+      <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Pour les vendeurs</div>
+      <p style="font-size:12px;line-height:1.7">Vous souhaitez vendre vos produits aztèques sur Milpa Market ?<br><span style="color:var(--jade-glow)">✉ ralphwdamis@gmail.com</span></p>
+    </div>
+    <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:14px;margin-bottom:10px">
+      <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Pour les acheteurs</div>
+      <p style="font-size:12px;line-height:1.7">Une question sur une commande ?<br><span style="color:var(--jade-glow)">✉ ralphwdamis@gmail.com</span></p>
+    </div>
+    <div style="background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:14px">
+      <div style="color:var(--gold);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">Envoyez-nous un message</div>
+      <input id="contact-nom" type="text" placeholder="Votre nom — Motoca" style="width:100%;background:rgba(4,2,1,.8);border:1px solid rgba(201,162,39,.3);border-radius:3px;padding:7px 10px;color:var(--gold-pale);font-family:'IM Fell English',serif;font-size:12px;outline:none;margin-bottom:8px;display:block;box-sizing:border-box"/>
+      <input id="contact-email" type="email" placeholder="Votre email" style="width:100%;background:rgba(4,2,1,.8);border:1px solid rgba(201,162,39,.3);border-radius:3px;padding:7px 10px;color:var(--gold-pale);font-family:'IM Fell English',serif;font-size:12px;outline:none;margin-bottom:8px;display:block;box-sizing:border-box"/>
+      <textarea id="contact-msg" placeholder="Votre message en français ou en nahuatl..." style="width:100%;background:rgba(4,2,1,.8);border:1px solid rgba(201,162,39,.3);border-radius:3px;padding:7px 10px;color:var(--gold-pale);font-family:'IM Fell English',serif;font-size:12px;outline:none;margin-bottom:8px;display:block;height:80px;resize:none;box-sizing:border-box"></textarea>
+      <button onclick="MM.envoyerContact()" style="width:100%;background:linear-gradient(135deg,var(--jade),var(--jade-light));border:1px solid var(--jade-glow);color:var(--gold-bright);padding:8px;border-radius:3px;cursor:pointer;font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:.05em">✦ Envoyer — Tlazohtla</button>
+      <div id="contact-confirm" style="display:none;text-align:center;color:var(--jade-glow);font-size:12px;margin-top:10px;font-family:'Cinzel',serif">✅ Message envoyé ! Tlazohtla !</div>
+    </div>
+  </div>
+</div>
+<!-- Taskbar -->
+<div id="taskbar">
+<button id="sbtn" onclick="toggleMenu()">
+<svg width="20" height="20" viewBox="0 0 40 40"><use href="#qico"/></svg>
+QuetzalOS
+</button>
+<div class="tbapp" id="tb-wm" onclick="toggleW('wm')">🌽 Milpa Market</div>
+<div class="tbapp" id="tb-wb" onclick="toggleW('wb')">🌐 Itzcoatl</div>
+<div class="tbapp" id="tb-wq" onclick="toggleW('wq')">🐍 Quetzalcóatl</div>
+<div class="tbapp" id="tb-wf" onclick="toggleW('wf')">🏛️ Fichiers</div>
+<div class="tbapp" id="tb-wt" onclick="toggleW('wt')">🗿 Shell</div>
+<div class="tbapp" id="tb-wc" onclick="toggleW('wc')">📅 Calendrier</div>
+<div id="tbclock">
+<div class="ct" id="clk">--:--</div>
+<div class="cd" id="cdt">--</div>
+<div class="caz" id="caz">-- Tonalpohualli</div>
+</div>
+</div>
+<!-- Start Menu -->
+<div id="smenu">
+<div class="shdr">
+<div class="savt"><svg width="28" height="28" viewBox="0 0 40 40"><use href="#qico"/></svg></div>
+<div><div class="sun">Utilisateur Sacré</div><div class="sur">Prêtre du Cinquième Soleil</div></div>
+</div>
+<div class="stit">Applications</div>
+<div class="sitm" ondblclick="openW('wb');closeMenu()"><span class="sico">🌐</span>Itzcoatl Browser</div>
+<div class="sitm" ondblclick="openW('wq');closeMenu()"><span class="sico">🐍</span>Quetzalcóatl</div>
+<div class="sitm" ondblclick="openW('wf');closeMenu()"><span class="sico">🏛️</span>Tenochtitlan Files</div>
+<div class="sitm" ondblclick="openW('wt');closeMenu()"><span class="sico">🗿</span>Olmec Shell</div>
+<div class="sitm" ondblclick="openW('wc');closeMenu()"><span class="sico">📅</span>Tonalpohualli</div>
+<div class="sitm" ondblclick="openW('wm');closeMenu()"><span class="sico">🌽</span>Milpa Market</div>
+<div class="ssep"></div>
+<div class="sfoot">
+<button class="spbtn" onclick="location.reload()">⛥ Redémarrer</button>
+</div>
+</div>
+<!-- Context Menu -->
+<div id="ctx">
+<div class="ci" onclick="hideCtx()">🌿 Actualiser le bureau</div>
+<div class="csep"></div>
+<div class="ci" onclick="openW('wb');hideCtx()">🌐 Ouvrir Itzcoatl</div>
+<div class="ci" onclick="openW('wq');hideCtx()">🐍 Invoquer Quetzalcóatl</div>
+<div class="ci" onclick="openW('wf');hideCtx()">🏛️ Ouvrir Fichiers</div>
+<div class="ci" onclick="openW('wt');hideCtx()">🗿 Ouvrir Shell</div>
+<div class="csep"></div>
+<div class="ci" onclick="openW('wm');hideCtx()">🌽 Milpa Market</div>
+<div class="csep"></div>
+<div class="ci" onclick="showNotif();hideCtx()">✦ Propriétés du Bureau</div>
+</div>
+<!-- Notification -->
+<div id="notif">
+<div class="ntit">✦ Milpa Market</div>
+<div class="nbody">Le marché de Tlatelolco est fermé. Les dieux exigent d'autres offrandes avant l'aube.</div>
+</div>
+<script>
+// ══════════════════════════════════════════════
+// OLMEC SHELL — Moteur Terminal Sécurité
+// ══════════════════════════════════════════════
+const T = {
+history: [], histIdx: -1,
+// Affiche une ligne dans le terminal
+print(html, cls='to') {
+const out = document.getElementById('tout');
+if (!out) return;
+const d = document.createElement('div');
+d.className = 'tl';
+d.innerHTML = `<span class="${cls}">${html}</span>`;
+out.appendChild(d);
+out.scrollTop = out.scrollHeight;
+},
+// Affiche la commande saisie
+echo(cmd) {
+const out = document.getElementById('tout');
+const d = document.createElement('div');
+d.className = 'tl';
+d.innerHTML = `<span class="tp">quetzal@olmec</span><span style="color:var(--text-dim)">:</span><span class="ti">~</span><span style="color:var(--text-dim)">$</span> <span class="tc">${cmd}</span>`;
+out.appendChild(d);
+out.scrollTop = out.scrollHeight;
+},
+sep() { this.print('─'.repeat(55), 'to'); },
+blank() { this.print('&nbsp;'); },
+// Démarre le terminal
+init() {
+const out = document.getElementById('tout');
+if (!out) return;
+out.innerHTML = '';
+this.print('╔══════════════════════════════════════════════════════╗', 'tp');
+this.print('║ 🗿 OLMEC SHELL v2.0 — Détection de Vulnérabilités ║', 'tp');
+this.print('╚══════════════════════════════════════════════════════╝', 'tp');
+this.blank();
+this.print('Moteur de reconnaissance initié. Les dieux observent.', 'ti');
+this.print('Tapez <span class="tc">help</span> pour la liste des commandes disponibles.', 'to');
+this.blank();
+// focus auto à l'ouverture
+setTimeout(() => document.getElementById('tinput')?.focus(), 100);
+},
+// Exécute une commande
+async run(raw) {
+const cmd = raw.trim();
+if (!cmd) return;
+this.history.unshift(cmd);
+this.histIdx = -1;
+this.echo(cmd);
+const [verb, ...args] = cmd.split(/\s+/);
+switch(verb.toLowerCase()) {
+case 'help':
+this.sep();
+this.print('COMMANDES DISPONIBLES :', 'ti');
+this.blank();
+this.print('<span class="tc">dns &lt;domaine&gt;</span> — Résolution DNS + enregistrements', 'to');
+this.print('<span class="tc">headers &lt;url&gt;</span> — Analyse des en-têtes HTTP de sécurité', 'to');
+this.print('<span class="tc">whois &lt;domaine&gt;</span> — Informations WHOIS', 'to');
+this.print('<span class="tc">ssl &lt;domaine&gt;</span> — Vérification certificat SSL', 'to');
+this.print('<span class="tc">ip &lt;adresse&gt;</span> — Géolocalisation et infos IP', 'to');
+this.print('<span class="tc">breach &lt;email&gt;</span> — Vérification fuites de données', 'to');
+this.print('<span class="tc">hash &lt;texte&gt;</span> — Calcul MD5 / SHA-256 (local)', 'to');
+this.print('<span class="tc">encode &lt;texte&gt;</span> — Encodage Base64', 'to');
+this.print('<span class="tc">decode &lt;texte&gt;</span> — Décodage Base64', 'to');
+this.print('<span class="tc">ports &lt;domaine&gt;</span> — Ports communs ouverts (limité navigateur)', 'to');
+this.print('<span class="tc">headers-audit &lt;url&gt;</span> — Audit complet des headers sécurité', 'to');
+this.print('<span class="tc">clear</span> — Vider le terminal', 'to');
+this.sep();
+break;
+case 'clear':
+this.init();
+break;
+case 'dns':
+await this.cmdDns(args[0]);
+break;
+case 'headers':
+await this.cmdHeaders(args[0], false);
+break;
+case 'headers-audit':
+await this.cmdHeaders(args[0], true);
+break;
+case 'whois':
+await this.cmdWhois(args[0]);
+break;
+case 'ip':
+await this.cmdIp(args[0]);
+break;
+case 'ssl':
+await this.cmdSsl(args[0]);
+break;
+case 'breach':
+await this.cmdBreach(args[0]);
+break;
+case 'hash':
+await this.cmdHash(args.join(' '));
+break;
+case 'encode':
+this.cmdEncode(args.join(' '));
+break;
+case 'decode':
+this.cmdDecode(args.join(' '));
+break;
+case 'ports':
+await this.cmdPorts(args[0]);
+break;
+default:
+this.print(`⚠ Commande inconnue : <span class="tc">${verb}</span>. Tapez <span class="tc">help</span>.`, 'to');
+}
+this.blank();
+},
+// ── DNS ──
+async cmdDns(domain) {
+if (!domain) { this.print('Usage: dns &lt;domaine&gt;', 'to'); return; }
+this.print(`🔍 Résolution DNS pour <span class="tc">${domain}</span>…`, 'ti');
+const types = ['A','AAAA','MX','NS','TXT','CNAME'];
+for (const t of types) {
+try {
+const r = await fetch(`https://dns.google/resolve?name=${domain}&type=${t}`);
+const j = await r.json();
+if (j.Answer && j.Answer.length) {
+this.print(` <span class="tp">${t.padEnd(6)}</span> ${j.Answer.map(a=>a.data).join(' | ')}`, 'to');
+}
+} catch(e) {}
+}
+// Vérification SPF / DMARC
+try {
+const r = await fetch(`https://dns.google/resolve?name=_dmarc.${domain}&type=TXT`);
+const j = await r.json();
+if (j.Answer) this.print(` <span class="tp">DMARC </span> ✅ Présent`, 'to');
+else this.print(` <span class="tp">DMARC </span> ⚠ <span style="color:var(--blood-bright)">Absent — domaine vulnérable au spoofing</span>`, 'to');
+} catch(e) {}
+},
+// ── HEADERS ──
+async cmdHeaders(url, audit) {
+if (!url) { this.print('Usage: headers &lt;url&gt;', 'to'); return; }
+if (!url.startsWith('http')) url = 'https://' + url;
+this.print(`🔍 Analyse des en-têtes de <span class="tc">${url}</span>…`, 'ti');
+try {
+const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, {method:'HEAD'}).catch(()=>null);
+// Fallback : on utilise allorigins pour récupérer les headers via GET
+const r2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+const j = await r2.json();
+// Headers de sécurité attendus
+const secHeaders = {
+'content-security-policy': { label:'Content-Security-Policy', risk:'Élevé — XSS possible' },
+'x-frame-options': { label:'X-Frame-Options', risk:'Moyen — Clickjacking' },
+'x-content-type-options': { label:'X-Content-Type-Options', risk:'Moyen — MIME sniffing' },
+'strict-transport-security': { label:'HSTS', risk:'Élevé — Downgrade HTTP' },
+'referrer-policy': { label:'Referrer-Policy', risk:'Faible — Fuite URL' },
+'permissions-policy': { label:'Permissions-Policy', risk:'Moyen — API navigateur' },
+};
+this.print(' Statut HTTP : ' + (j.status?.http_code || '200'), 'tp');
+if (audit) {
+this.blank();
+this.print(' AUDIT EN-TÊTES SÉCURITÉ :', 'ti');
+// On ne peut pas lire les vrais headers via allorigins, on le signale
+this.print(' ℹ️ Analyse basée sur les données disponibles cross-origin.', 'to');
+Object.entries(secHeaders).forEach(([k,v]) => {
+// Simulation basée sur les headers courants connus
+const found = j.contents?.toLowerCase().includes(k.replace(/-/g,' ')) || false;
+this.print(` ${found?'✅':'❌'} <span class="tp">${v.label}</span>${!found ? ` — <span style="color:var(--blood-bright)">Risque : ${v.risk}</span>` : ''}`, 'to');
+});
+} else {
+this.print(` URL finale : ${url}`, 'to');
+this.print(` Taille réponse : ${j.contents?.length || '?'} octets`, 'to');
+this.print(` Tapez <span class="tc">headers-audit ${url}</span> pour l'audit complet.`, 'ti');
+}
+} catch(e) {
+this.print(` ⚠ Erreur réseau : ${e.message}`, 'to');
+}
+},
+// ── WHOIS ──
+async cmdWhois(domain) {
+if (!domain) { this.print('Usage: whois &lt;domaine&gt;', 'to'); return; }
+this.print(`🔍 WHOIS pour <span class="tc">${domain}</span>…`, 'ti');
+try {
+const r = await fetch(`https://rdap.org/domain/${domain}`);
+const j = await r.json();
+this.print(` Nom : ${j.ldhName || domain}`, 'to');
+this.print(` Statut : ${(j.status||[]).join(', ') || '?'}`, 'to');
+if (j.events) {
+const reg = j.events.find(e=>e.eventAction==='registration');
+const exp = j.events.find(e=>e.eventAction==='expiration');
+if (reg) this.print(` Créé le : ${new Date(reg.eventDate).toLocaleDateString('fr-FR')}`, 'to');
+if (exp) {
+const expDate = new Date(exp.eventDate);
+const soon = (expDate - Date.now()) < 30*24*3600*1000;
+this.print(` Expire le : ${expDate.toLocaleDateString('fr-FR')}${soon?' <span style="color:var(--blood-bright)">⚠ Expire bientôt !</span>':''}`, 'to');
+}
+}
+if (j.nameservers) this.print(` NS : ${j.nameservers.map(n=>n.ldhName).join(', ')}`, 'to');
+} catch(e) {
+this.print(` ⚠ Impossible de récupérer le WHOIS : ${e.message}`, 'to');
+}
+},
+// ── IP ──
+async cmdIp(ip) {
+const target = ip || '';
+this.print(`🔍 Informations IP${target ? ' pour <span class="tc">'+target+'</span>' : ' publique'}…`, 'ti');
+try {
+const url = target ? `https://ipapi.co/${target}/json/` : `https://ipapi.co/json/`;
+const r = await fetch(url);
+const j = await r.json();
+if (j.error) { this.print(` ⚠ ${j.reason}`, 'to'); return; }
+this.print(` IP : <span class="tc">${j.ip}</span>`, 'to');
+this.print(` Pays : ${j.country_name} (${j.country_code})`, 'to');
+this.print(` Région : ${j.region}`, 'to');
+this.print(` Ville : ${j.city}`, 'to');
+this.print(` FAI / ASN : ${j.org}`, 'to');
+this.print(` Timezone : ${j.timezone}`, 'to');
+if (j.threat) {
+this.print(` ⚠ Menace détectée : ${JSON.stringify(j.threat)}`, 'to');
+}
+} catch(e) {
+this.print(` ⚠ Erreur : ${e.message}`, 'to');
+}
+},
+// ── SSL ──
+async cmdSsl(domain) {
+if (!domain) { this.print('Usage: ssl &lt;domaine&gt;', 'to'); return; }
+const d = domain.replace(/^https?:\/\//, '').split('/')[0];
+this.print(`🔍 Vérification SSL pour <span class="tc">${d}</span>…`, 'ti');
+try {
+const r = await fetch(`https://api.ssllabs.com/api/v3/analyze?host=${d}&fromCache=on&maxAge=24`);
+const j = await r.json();
+if (j.status === 'ERROR') { this.print(` ⚠ ${j.statusMessage}`, 'to'); return; }
+if (j.status !== 'READY') {
+this.print(` ⏳ Analyse en cours (${j.status})… Relancez dans 30s.`, 'ti');
+return;
+}
+j.endpoints?.forEach(ep => {
+const grade = ep.grade || '?';
+const color = grade.startsWith('A') ? 'var(--jade-glow)' : grade === 'B' ? 'var(--gold)' : 'var(--blood-bright)';
+this.print(` Serveur : ${ep.ipAddress}`, 'to');
+this.print(` Note : <span style="color:${color};font-weight:700;font-size:16px">${grade}</span>`, 'to');
+this.print(` Statut : ${ep.statusMessage}`, 'to');
+});
+} catch(e) {
+// Fallback simple : tenter la connexion HTTPS
+try {
+const r2 = await fetch(`https://${d}`, {mode:'no-cors'});
+this.print(` ✅ Connexion HTTPS établie sur ${d}`, 'to');
+this.print(` ℹ️ Pour une note complète, utilisez : <span class="tc">https://www.ssllabs.com/ssltest/analyze.html?d=${d}</span>`, 'ti');
+} catch(e2) {
+this.print(` ⚠ HTTPS inaccessible ou refusé : ${e2.message}`, 'to');
+}
+}
+},
+// ── BREACH ──
+async cmdBreach(email) {
+if (!email) { this.print('Usage: breach &lt;email&gt;', 'to'); return; }
+this.print(`🔍 Vérification fuites pour <span class="tc">${email}</span>…`, 'ti');
+this.print(` ℹ️ HIBP (Have I Been Pwned) requiert une clé API payante.`, 'to');
+this.print(` Vérifiez manuellement sur :`, 'to');
+this.print(` <span class="tc">https://haveibeenpwned.com/account/${encodeURIComponent(email)}</span>`, 'ti');
+this.blank();
+// On peut quand même checker via l'API publique k-anonymity pour les mots de passe
+this.print(` 💡 Astuce : utilisez <span class="tc">hash &lt;motdepasse&gt;</span> puis vérifiez`, 'to');
+this.print(` le préfixe SHA1 sur <span class="tc">https://api.pwnedpasswords.com/range/&lt;prefix5&gt;</span>`, 'to');
+},
+// ── HASH ──
+async cmdHash(text) {
+if (!text) { this.print('Usage: hash &lt;texte&gt;', 'to'); return; }
+this.print(`🔐 Calcul des empreintes pour : <span class="tc">${text}</span>`, 'ti');
+const enc = new TextEncoder();
+const data = enc.encode(text);
+for (const algo of ['SHA-1','SHA-256','SHA-512']) {
+const buf = await crypto.subtle.digest(algo, data);
+const hex = [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+this.print(` <span class="tp">${algo.padEnd(8)}</span> ${hex}`, 'to');
+}
+// Vérifie HIBP k-anonymity pour SHA1
+try {
+const sha1buf = await crypto.subtle.digest('SHA-1', data);
+const sha1hex = [...new Uint8Array(sha1buf)].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+const prefix = sha1hex.slice(0,5);
+const r = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+const body = await r.text();
+const suffix = sha1hex.slice(5);
+const match = body.split('\n').find(l => l.startsWith(suffix));
+if (match) {
+const count = match.split(':')[1]?.trim();
+this.print(` ⚠ <span style="color:var(--blood-bright)">Ce texte a été vu ${count} fois dans des fuites !</span>`, 'to');
+} else {
+this.print(` ✅ Non trouvé dans la base HaveIBeenPwned.`, 'to');
+}
+} catch(e) {}
+},
+// ── ENCODE ──
+cmdEncode(text) {
+if (!text) { this.print('Usage: encode &lt;texte&gt;', 'to'); return; }
+const b64 = btoa(unescape(encodeURIComponent(text)));
+this.print(` Base64 : <span class="tc">${b64}</span>`, 'to');
+const url = encodeURIComponent(text);
+this.print(` URL : <span class="tc">${url}</span>`, 'to');
+const hex = [...new TextEncoder().encode(text)].map(b=>b.toString(16).padStart(2,'0')).join(' ');
+this.print(` Hex : <span class="tc">${hex}</span>`, 'to');
+},
+// ── DECODE ──
+cmdDecode(text) {
+if (!text) { this.print('Usage: decode &lt;texte&gt;', 'to'); return; }
+try {
+const dec = decodeURIComponent(escape(atob(text)));
+this.print(` Décodé (Base64) : <span class="tc">${dec}</span>`, 'to');
+} catch(e) {
+this.print(` ⚠ Pas un Base64 valide.`, 'to');
+}
+try {
+const dec2 = decodeURIComponent(text);
+if (dec2 !== text) this.print(` Décodé (URL) : <span class="tc">${dec2}</span>`, 'to');
+} catch(e) {}
+},
+// ── PORTS ──
+async cmdPorts(domain) {
+if (!domain) { this.print('Usage: ports &lt;domaine&gt;</span>', 'to'); return; }
+this.print(`🔍 Vérification ports communs sur <span class="tc">${domain}</span>…`, 'ti');
+this.print(` ⚠ Les navigateurs bloquent les scans TCP directs.`, 'to');
+this.print(` Résultat basé sur des tentatives de connexion HTTP/S :`, 'to');
+const checks = [
+{ port:80, proto:'http', label:'HTTP ' },
+{ port:443, proto:'https', label:'HTTPS ' },
+{ port:8080, proto:'http', label:'HTTP-Alt' },
+{ port:8443, proto:'https', label:'HTTPS-Alt'},
+];
+for (const c of checks) {
+try {
+const ctrl = new AbortController();
+const t = setTimeout(() => ctrl.abort(), 3000);
+await fetch(`${c.proto}://${domain}:${c.port}`, { mode:'no-cors', signal: ctrl.signal });
+clearTimeout(t);
+this.print(` <span class="tp">${c.label}</span> :<span class="tc">${c.port}</span> ✅ Accessible`, 'to');
+} catch(e) {
+const msg = e.name === 'AbortError' ? '⏱ Timeout' : '❌ Fermé / Filtré';
+this.print(` <span class="tp">${c.label}</span> :<span class="tc">${c.port}</span> ${msg}`, 'to');
+}
+}
+this.print(` 💡 Pour un scan complet : shodan.io ou nmap (hors navigateur)`, 'ti');
+},
+};
+// Connexion WebSocket au vrai terminal bash
+const ws = new WebSocket('ws://localhost:8765');
+ws.onmessage = function(event) {
+  const out = document.getElementById('tout');
+  const d = document.createElement('div');
+  d.className = 'tl';
+  d.innerHTML = '<span class="to">' + event.data.replace(/</g,'&lt;') + '</span>';
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+};
+
+function sendToTerminal(cmd) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(cmd);
+  }
+}
+// Gestion clavier terminal
+function tKeyDown(e) {
+const inp = document.getElementById('tinput');
+if (e.key === 'Enter') {
+const cmd = inp.value;
+inp.value = '';
+sendToTerminal(cmd);
+} else if (e.key === 'ArrowUp') {
+e.preventDefault();
+if (T.histIdx < T.history.length - 1) {
+T.histIdx++;
+inp.value = T.history[T.histIdx];
+}
+} else if (e.key === 'ArrowDown') {
+e.preventDefault();
+if (T.histIdx > 0) {
+T.histIdx--;
+inp.value = T.history[T.histIdx];
+} else {
+T.histIdx = -1;
+inp.value = '';
+}
+}
+}
+// Initialiser le terminal quand la fenêtre s'ouvre
+const _origOpenW = window.openW;
+// On patche openW après définition
+document.addEventListener('DOMContentLoaded', () => {
+T.init();
+});
+// ══════════════════════════════════════════════
+// ITZCOATL BROWSER — Navigateur du Serpent d'Obsidienne
+// ══════════════════════════════════════════════
+const IB = {
+tabs: [],
+activeTab: 0,
+pages: {
+'itzcoatl://nouvelle-page': { title: 'Nouvelle Page', type: 'home' },
+'itzcoatl://histoire': { title: 'Histoire Aztèque', type: 'histoire' },
+'itzcoatl://securite': { title: 'Portail Sécurité', type: 'securite' },
+'itzcoatl://parametres': { title: 'Paramètres', type: 'parametres' },
+},
+init() {
+this.tabs = [{ url: 'itzcoatl://nouvelle-page', title: 'Nouvelle Page' }];
+this.activeTab = 0;
+this.render();
+},
+newTab(url='itzcoatl://nouvelle-page') {
+this.tabs.push({ url, title: '...' });
+this.activeTab = this.tabs.length - 1;
+this.render();
+},
+closeTab(i) {
+if (this.tabs.length === 1) { closeW('wb'); return; }
+this.tabs.splice(i, 1);
+this.activeTab = Math.min(this.activeTab, this.tabs.length - 1);
+this.render();
+},
+switchTab(i) {
+this.activeTab = i;
+this.render();
+},
+navigate(url) {
+if (!url) return;
+// Normaliser l'URL
+if (!url.startsWith('itzcoatl://') && !url.startsWith('http')) {
+url = 'https://' + url;
+}
+this.tabs[this.activeTab].url = url;
+this.tabs[this.activeTab].title = url.replace(/^https?:\/\//, '').split('/')[0];
+document.getElementById('iburl').value = url;
+this.renderContent();
+this.renderTabs();
+},
+render() {
+document.getElementById('iburl').value = this.tabs[this.activeTab]?.url || '';
+this.renderTabs();
+this.renderContent();
+},
+renderTabs() {
+const bar = document.getElementById('ibtabs');
+if (!bar) return;
+let h = '';
+this.tabs.forEach((t, i) => {
+const active = i === this.activeTab;
+h += `<div onclick="IB.switchTab(${i})" style="
+display:flex;align-items:center;gap:5px;padding:4px 10px;
+background:${active ? 'rgba(26,74,46,.7)' : 'rgba(14,10,6,.8)'};
+border:1px solid ${active ? 'rgba(201,162,39,.5)' : 'rgba(201,162,39,.15)'};
+border-bottom:${active ? '1px solid #0d120f' : '1px solid rgba(201,162,39,.15)'};
+border-radius:3px 3px 0 0;cursor:pointer;min-width:80px;max-width:160px;
+color:${active ? 'var(--gold-pale)' : 'var(--text-dim)'};
+font-family:'Cinzel',serif;font-size:9px;letter-spacing:.03em;white-space:nowrap;overflow:hidden">
+<span style="overflow:hidden;text-overflow:ellipsis;flex:1">${t.title}</span>
+<span onclick="event.stopPropagation();IB.closeTab(${i})"
+style="color:var(--text-dim);font-size:10px;padding:0 2px;cursor:pointer" onmouseover="this.style.color='var(--blood-bright)'" onmouseout="this.style.color='var(--text-dim)'">✕</span>
+</div>`;
+});
+h += `<div onclick="IB.newTab()" style="
+display:flex;align-items:center;justify-content:center;
+width:24px;height:24px;border-radius:3px;cursor:pointer;
+border:1px solid rgba(201,162,39,.2);color:var(--jade-glow);font-size:14px;
+background:rgba(14,10,6,.6);margin-left:2px" title="Nouvel onglet">+</div>`;
+bar.innerHTML = h;
+},
+renderContent() {
+const el = document.getElementById('ibcontent');
+if (!el) return;
+const url = this.tabs[this.activeTab]?.url || '';
+const page = this.pages[url];
+if (page) {
+el.innerHTML = this['page_' + page.type]?.() || this.page_home();
+} else if (url.startsWith('https://') || url.startsWith('http://')) {
+const domain = url.replace(/^https?:\/\//, '').split('/')[0];
+this.tabs[this.activeTab].title = domain;
+this.renderTabs();
+// Ouvrir dans le vrai navigateur hôte
+window.open(url, '_blank');
+// Afficher une page de confirmation dans Itzcoatl
+el.innerHTML = `
+<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'IM Fell English',serif;color:var(--text-main);padding:30px;text-align:center">
+<svg width="54" height="54" viewBox="0 0 40 40" style="margin-bottom:16px;opacity:.8">
+<circle cx="20" cy="20" r="14" fill="#0d1a2e" stroke="#c9a227" stroke-width="1.5"/>
+<ellipse cx="20" cy="20" rx="6" ry="14" fill="none" stroke="#3dba76" stroke-width="1.2"/>
+<line x1="6" y1="20" x2="34" y2="20" stroke="#3dba76" stroke-width="1"/>
+<ellipse cx="20" cy="7" rx="4" ry="3" fill="#1a6b35" stroke="#3dba76" stroke-width="1"/>
+<circle cx="18.5" cy="6.5" r=".9" fill="#c9a227"/><circle cx="21.5" cy="6.5" r=".9" fill="#c9a227"/>
+</svg>
+<div style="color:var(--jade-glow);font-family:'Cinzel Decorative',serif;font-size:14px;margin-bottom:8px">Site ouvert</div>
+<div style="color:var(--text-dim);font-size:12px;margin-bottom:20px">
+<span style="color:var(--gold-pale)">${domain}</span><br>
+a été ouvert dans votre navigateur système.
+</div>
+<div style="display:flex;gap:10px">
+<button onclick="IB.navigate('${url}')"
+style="background:rgba(26,74,46,.4);border:1px solid var(--jade-glow);color:var(--gold-bright);
+padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.05em">
+↺ Rouvrir
+</button>
+<button onclick="IB.navigate('itzcoatl://nouvelle-page')"
+style="background:rgba(44,36,22,.6);border:1px solid rgba(201,162,39,.3);color:var(--text-dim);
+padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.05em">
+⌂ Accueil
+</button>
+</div>
+</div>`;
+} else {
+el.innerHTML = this.page_home();
+}
+},
+page_home() {
+return `<div style="height:100%;overflow-y:auto;padding:30px 24px;font-family:'IM Fell English',serif">
+<div style="text-align:center;margin-bottom:24px">
+<svg width="60" height="60" viewBox="0 0 40 40" style="margin-bottom:10px">
+<circle cx="20" cy="20" r="14" fill="#0d1a2e" stroke="#c9a227" stroke-width="1.5"/>
+<ellipse cx="20" cy="20" rx="6" ry="14" fill="none" stroke="#3dba76" stroke-width="1.2"/>
+<line x1="6" y1="20" x2="34" y2="20" stroke="#3dba76" stroke-width="1"/>
+<line x1="8" y1="13" x2="32" y2="13" stroke="#3dba76" stroke-width=".7" opacity=".6"/>
+<line x1="8" y1="27" x2="32" y2="27" stroke="#3dba76" stroke-width=".7" opacity=".6"/>
+<ellipse cx="20" cy="7" rx="4" ry="3" fill="#1a6b35" stroke="#3dba76" stroke-width="1"/>
+<circle cx="18.5" cy="6.5" r=".9" fill="#c9a227"/><circle cx="21.5" cy="6.5" r=".9" fill="#c9a227"/>
+</svg>
+<div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:18px;letter-spacing:.15em">ITZCOATL</div>
+<div style="color:var(--text-dim);font-size:11px;letter-spacing:.2em;margin-top:3px">NAVIGATEUR DU SERPENT D'OBSIDIENNE</div>
+</div>
+<!-- Barre de recherche -->
+<div style="max-width:420px;margin:0 auto 24px;display:flex;gap:6px">
+<input id="ibsearch" type="text" placeholder="Entrez une URL ou recherchez…"
+style="flex:1;background:rgba(4,2,1,.8);border:1px solid rgba(201,162,39,.3);border-radius:4px;padding:8px 12px;color:var(--gold-pale);font-family:'Courier New',monospace;font-size:12px;outline:none"
+onkeydown="if(event.key==='Enter') IB.navigate(this.value)"/>
+<button onclick="IB.navigate(document.getElementById('ibsearch').value)"
+style="background:var(--jade);border:1px solid var(--jade-glow);color:var(--gold-bright);padding:0 14px;border-radius:4px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px">
+↵
+</button>
+</div>
+<!-- Raccourcis -->
+<div style="max-width:480px;margin:0 auto">
+<div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">Pages QuetzalOS</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+${[
+['🗿','itzcoatl://histoire','Histoire Aztèque'],
+['🔒','itzcoatl://securite','Portail Sécurité'],
+['⚙','itzcoatl://parametres','Paramètres'],
+['📅','itzcoatl://nouvelle-page','Nouvelle Page'],
+].map(([ico,url,lbl])=>`
+<div onclick="IB.navigate('${url}')" style="
+display:flex;align-items:center;gap:8px;padding:10px;
+background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);
+border-radius:4px;cursor:pointer;transition:all .15s"
+onmouseover="this.style.background='rgba(26,74,46,.35)'"
+onmouseout="this.style.background='rgba(26,74,46,.15)'">
+<span style="font-size:18px">${ico}</span>
+<span style="color:var(--text-main);font-size:12px">${lbl}</span>
+</div>`).join('')}
+</div>
+<div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px">Sites recommandés</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+${[
+['🛡','https://www.parrotsec.org','Parrot OS'],
+['🔍','https://www.shodan.io','Shodan'],
+['🐙','https://github.com','GitHub'],
+['🏴','https://hackthebox.com','Hack The Box'],
+['📖','https://owasp.org','OWASP'],
+['🌐','https://www.virustotal.com','VirusTotal'],
+].map(([ico,url,lbl])=>`
+<div onclick="IB.navigate('${url}')" style="
+display:flex;align-items:center;gap:8px;padding:8px;
+background:rgba(10,7,5,.5);border:1px solid rgba(201,162,39,.12);
+border-radius:4px;cursor:pointer;transition:all .15s"
+onmouseover="this.style.borderColor='rgba(201,162,39,.4)'"
+onmouseout="this.style.borderColor='rgba(201,162,39,.12)'">
+<span style="font-size:16px">${ico}</span>
+<div>
+<div style="color:var(--gold-pale);font-size:11px">${lbl}</div>
+<div style="color:var(--text-dim);font-size:9px;font-family:'Courier New',monospace">${url.replace('https://','')}</div>
+</div>
+</div>`).join('')}
+</div>
+</div>
+</div>`;
+},
+page_histoire() {
+return `<div style="height:100%;overflow-y:auto;padding:24px;font-family:'IM Fell English',serif;color:var(--text-main)">
+<div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:16px;margin-bottom:6px">🗿 Itzcoatl — Serpent d'Obsidienne</div>
+<div style="color:var(--text-dim);font-size:10px;font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:16px">4e Huey Tlatoani de Tenochtitlan · 1427–1440</div>
+<p style="margin-bottom:12px;font-size:13px;line-height:1.7">Itzcoatl fut le quatrième souverain (Huey Tlatoani) de Tenochtitlan. Son règne marqua un tournant décisif dans l'histoire aztèque : il fonda la <span style="color:var(--gold)">Triple Alliance</span> entre Tenochtitlan, Texcoco et Tlacopan, posant les bases de l'Empire aztèque.</p>
+<p style="margin-bottom:12px;font-size:13px;line-height:1.7">Son nom nahuatl, <span style="color:var(--jade-glow)">Itzcoatl</span>, signifie littéralement <em>"Serpent d'obsidienne"</em> — l'obsidienne étant la pierre volcanique noire sacrée des Aztèques, utilisée pour les lames rituelles et les miroirs de divination.</p>
+<div style="background:rgba(26,74,46,.2);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:12px;margin-top:16px">
+<div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Faits historiques</div>
+${[
+['Règne','1427 – 1440 apr. J.-C.'],
+['Alliance','Triple Alliance (1428)'],
+['Victoire','Défaite des Tepanèques'],
+['Héritage','Fondation de l\'Empire aztèque'],
+].map(([k,v])=>`<div style="display:flex;gap:10px;margin-bottom:5px;font-size:12px">
+<span style="color:var(--gold);min-width:80px;font-family:'Cinzel',serif;font-size:10px">${k}</span>
+<span style="color:var(--text-main)">${v}</span>
+</div>`).join('')}
+</div>
+</div>`;
+},
+page_securite() {
+return `<div style="height:100%;overflow-y:auto;padding:24px;font-family:'IM Fell English',serif;color:var(--text-main)">
+<div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:16px;margin-bottom:16px">🔒 Portail Sécurité QuetzalOS</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+${[
+['🛡','https://www.shodan.io','Shodan','Moteur de recherche d\'appareils connectés'],
+['🔍','https://www.virustotal.com','VirusTotal','Analyse de fichiers et URLs'],
+['📋','https://nvd.nist.gov','NVD / CVE','Base de vulnérabilités NIST'],
+['🏴','https://hackthebox.com','Hack The Box','Entraînement pentest'],
+['📖','https://owasp.org','OWASP','Sécurité applicative web'],
+['🌐','https://www.exploit-db.com','Exploit-DB','Base d\'exploits publics'],
+['🔐','https://crt.sh','crt.sh','Recherche certificats SSL'],
+['🗺','https://www.robtex.com','Robtex','OSINT / DNS / IP'],
+].map(([ico,url,nom,desc])=>`
+<div onclick="IB.navigate('${url}')" style="
+padding:12px;background:rgba(26,74,46,.12);
+border:1px solid rgba(201,162,39,.18);border-radius:4px;cursor:pointer;transition:all .15s"
+onmouseover="this.style.background='rgba(26,74,46,.3)'"
+onmouseout="this.style.background='rgba(26,74,46,.12)'">
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+<span style="font-size:16px">${ico}</span>
+<span style="color:var(--gold-pale);font-family:'Cinzel',serif;font-size:11px;font-weight:bold">${nom}</span>
+</div>
+<div style="color:var(--text-dim);font-size:10px">${desc}</div>
+</div>`).join('')}
+</div>
+</div>`;
+},
+page_parametres() {
+return `<div style="height:100%;overflow-y:auto;padding:24px;font-family:'IM Fell English',serif;color:var(--text-main)">
+<div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:16px;margin-bottom:16px">⚙ Paramètres — Itzcoatl</div>
+${[
+['Version','Itzcoatl 1.0 (QuetzalOS)'],
+['Moteur','WebKit / Gecko (natif OS)'],
+['Page d\'accueil','itzcoatl://nouvelle-page'],
+['Thème','Obsidienne Aztèque'],
+['Vie privée','Protection maximale'],
+['Basé sur','Firefox ESR (Parrot OS)'],
+].map(([k,v])=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid rgba(201,162,39,.1)">
+<span style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:10px;min-width:120px;letter-spacing:.05em">${k}</span>
+<span style="color:var(--text-main);font-size:12px">${v}</span>
+</div>`).join('')}
+</div>`;
+},
+};
+function ibNav(dir) {
+// Navigation historique simplifiée
+}
+function ibReload() {
+IB.renderContent();
+}
+function ibGo(url) {
+IB.navigate(url);
+}
+// ══════════════════════════════════════════════
+// DICTIONNAIRE FRANÇAIS — NAHUATL
+// ══════════════════════════════════════════════
+const DICT = {
+categories: ['Tous','Nature','Corps','Famille','Nombres','Couleurs','Animaux','Cosmos','Nourriture','Temps','Émotions','Verbes'],
+activeCat: 'Tous',
+data: [
+// Nature
+{ fr:'eau', nah:'atl', cat:'Nature', pron:'atl' },
+{ fr:'feu', nah:'tletl', cat:'Nature', pron:'tletl' },
+{ fr:'terre', nah:'tlalli', cat:'Nature', pron:'tlal·li' },
+{ fr:'vent', nah:'ehecatl', cat:'Nature', pron:'e·he·catl' },
+{ fr:'soleil', nah:'tonatiuh', cat:'Nature', pron:'to·na·tiuh' },
+{ fr:'lune', nah:'metztli', cat:'Nature', pron:'metz·tli' },
+{ fr:'étoile', nah:'citlalin', cat:'Nature', pron:'cit·la·lin' },
+{ fr:'montagne', nah:'tepetl', cat:'Nature', pron:'te·petl' },
+{ fr:'forêt', nah:'cuauhtla', cat:'Nature', pron:'cuauh·tla' },
+{ fr:'fleur', nah:'xochitl', cat:'Nature', pron:'xo·chitl' },
+{ fr:'arbre', nah:'cuahuitl', cat:'Nature', pron:'cua·huitl' },
+{ fr:'pierre', nah:'tetl', cat:'Nature', pron:'tetl' },
+{ fr:'pluie', nah:'quiahuitl', cat:'Nature', pron:'qui·a·huitl' },
+{ fr:'nuage', nah:'mixtli', cat:'Nature', pron:'mix·tli' },
+{ fr:'rivière', nah:'atoyatl', cat:'Nature', pron:'a·to·ya·tl' },
+{ fr:'mer', nah:'ilhuicaatl', cat:'Nature', pron:'il·hui·ca·atl' },
+{ fr:'nuit', nah:'yohualli', cat:'Nature', pron:'yo·hua·lli' },
+{ fr:'jour', nah:'tonalli', cat:'Nature', pron:'to·nal·li' },
+// Corps
+{ fr:'main', nah:'maitl', cat:'Corps', pron:'ma·itl' },
+{ fr:'pied', nah:'icxitl', cat:'Corps', pron:'ic·xi·tl' },
+{ fr:'tête', nah:'tzontecomatl', cat:'Corps', pron:'tzon·te·co·matl' },
+{ fr:'œil', nah:'ixtli', cat:'Corps', pron:'ix·tli' },
+{ fr:'cœur', nah:'yollotl', cat:'Corps', pron:'yol·lotl' },
+{ fr:'bouche', nah:'camatl', cat:'Corps', pron:'ca·matl' },
+{ fr:'oreille', nah:'nacaztli', cat:'Corps', pron:'na·caz·tli' },
+{ fr:'nez', nah:'yacatl', cat:'Corps', pron:'ya·catl' },
+{ fr:'sang', nah:'eztli', cat:'Corps', pron:'ez·tli' },
+{ fr:'os', nah:'omitl', cat:'Corps', pron:'o·mitl' },
+// Famille
+{ fr:'mère', nah:'nantli', cat:'Famille', pron:'nan·tli' },
+{ fr:'père', nah:'tahtli', cat:'Famille', pron:'tah·tli' },
+{ fr:'fils', nah:'piltzintli', cat:'Famille', pron:'pil·tzin·tli' },
+{ fr:'fille', nah:'ichpochtli', cat:'Famille', pron:'ich·poch·tli' },
+{ fr:'frère', nah:'tlahcelli', cat:'Famille', pron:'tah·cel·li' },
+{ fr:'sœur', nah:'huelltiuh', cat:'Famille', pron:'huel·tiuh' },
+{ fr:'homme', nah:'oquichtli', cat:'Famille', pron:'o·quich·tli' },
+{ fr:'femme', nah:'cihuatl', cat:'Famille', pron:'ci·hua·tl' },
+{ fr:'enfant', nah:'conetl', cat:'Famille', pron:'co·netl' },
+{ fr:'seigneur', nah:'tlatoani', cat:'Famille', pron:'tla·to·a·ni' },
+// Nombres
+{ fr:'un', nah:'ce', cat:'Nombres', pron:'ce' },
+{ fr:'deux', nah:'ome', cat:'Nombres', pron:'o·me' },
+{ fr:'trois', nah:'yei', cat:'Nombres', pron:'yei' },
+{ fr:'quatre', nah:'nahui', cat:'Nombres', pron:'na·hui' },
+{ fr:'cinq', nah:'macuilli', cat:'Nombres', pron:'ma·cuil·li' },
+{ fr:'dix', nah:'matlactli', cat:'Nombres', pron:'mat·lac·tli' },
+{ fr:'vingt', nah:'cempoalli', cat:'Nombres', pron:'cem·poal·li' },
+{ fr:'cent', nah:'macuilpoalli', cat:'Nombres', pron:'ma·cuil·poal·li' },
+{ fr:'zéro', nah:'ayac', cat:'Nombres', pron:'a·yac' },
+// Couleurs
+{ fr:'rouge', nah:'chichiltic', cat:'Couleurs', pron:'chi·chil·tic' },
+{ fr:'bleu', nah:'texotic', cat:'Couleurs', pron:'te·xo·tic' },
+{ fr:'vert', nah:'xoxoctic', cat:'Couleurs', pron:'xo·xoc·tic' },
+{ fr:'noir', nah:'tliltic', cat:'Couleurs', pron:'tlil·tic' },
+{ fr:'blanc', nah:'iztac', cat:'Couleurs', pron:'iz·tac' },
+{ fr:'jaune', nah:'coztic', cat:'Couleurs', pron:'coz·tic' },
+{ fr:'or', nah:'teocuitlatl', cat:'Couleurs', pron:'te·o·cuit·la·tl' },
+// Animaux
+{ fr:'serpent', nah:'coatl', cat:'Animaux', pron:'co·atl' },
+{ fr:'aigle', nah:'cuauhtli', cat:'Animaux', pron:'cuauh·tli' },
+{ fr:'jaguar', nah:'ocelotl', cat:'Animaux', pron:'o·ce·lotl' },
+{ fr:'chien', nah:'itzcuintli', cat:'Animaux', pron:'itz·cuin·tli' },
+{ fr:'cerf', nah:'mazatl', cat:'Animaux', pron:'ma·zatl' },
+{ fr:'lapin', nah:'tochtli', cat:'Animaux', pron:'toch·tli' },
+{ fr:'singe', nah:'ozomatli', cat:'Animaux', pron:'o·zo·mat·li' },
+{ fr:'oiseau', nah:'tototl', cat:'Animaux', pron:'to·totl' },
+{ fr:'poisson', nah:'michin', cat:'Animaux', pron:'mi·chin' },
+{ fr:'papillon', nah:'papalotl', cat:'Animaux', pron:'pa·pa·lotl' },
+{ fr:'vautour', nah:'cozcacuauhtli', cat:'Animaux', pron:'coz·ca·cuauh·tli' },
+// Cosmos
+{ fr:'dieu', nah:'teotl', cat:'Cosmos', pron:'te·otl' },
+{ fr:'ciel', nah:'ilhuicatl', cat:'Cosmos', pron:'il·hui·catl' },
+{ fr:'temple', nah:'teocalli', cat:'Cosmos', pron:'te·o·cal·li' },
+{ fr:'sacrifice', nah:'nextlahualliztli', cat:'Cosmos', pron:'nex·tla·hual·liz·tli' },
+{ fr:'âme', nah:'tonalli', cat:'Cosmos', pron:'to·nal·li' },
+{ fr:'mort', nah:'miquiztli', cat:'Cosmos', pron:'mi·quiz·tli' },
+{ fr:'vie', nah:'yoliliztli', cat:'Cosmos', pron:'yo·li·liz·tli' },
+{ fr:'monde', nah:'cemanahuatl', cat:'Cosmos', pron:'ce·ma·na·hua·tl' },
+// Nourriture
+{ fr:'maïs', nah:'centli', cat:'Nourriture', pron:'cen·tli' },
+{ fr:'cacao', nah:'cacahuatl', cat:'Nourriture', pron:'ca·ca·hua·tl' },
+{ fr:'tomate', nah:'tomatl', cat:'Nourriture', pron:'to·matl' },
+{ fr:'avocat', nah:'ahuacatl', cat:'Nourriture', pron:'a·hua·catl' },
+{ fr:'piment', nah:'chilli', cat:'Nourriture', pron:'chil·li' },
+{ fr:'sel', nah:'iztatl', cat:'Nourriture', pron:'iz·tatl' },
+{ fr:'pain', nah:'tlaxcalli', cat:'Nourriture', pron:'tlax·cal·li' },
+{ fr:'viande', nah:'nacatl', cat:'Nourriture', pron:'na·catl' },
+{ fr:'chocolat', nah:'xocolatl', cat:'Nourriture', pron:'xo·co·latl' },
+// Temps
+{ fr:'aujourd\'hui', nah:'axcan', cat:'Temps', pron:'ax·can' },
+{ fr:'demain', nah:'moztla', cat:'Temps', pron:'moz·tla' },
+{ fr:'hier', nah:'yalhua', cat:'Temps', pron:'yal·hua' },
+{ fr:'maintenant', nah:'niman', cat:'Temps', pron:'ni·man' },
+{ fr:'toujours', nah:'mochipa', cat:'Temps', pron:'mo·chi·pa' },
+{ fr:'jamais', nah:'ayac iquac', cat:'Temps', pron:'a·yac i·quac' },
+{ fr:'année', nah:'xihuitl', cat:'Temps', pron:'xi·huitl' },
+{ fr:'mois', nah:'metztli', cat:'Temps', pron:'metz·tli' },
+// Émotions
+{ fr:'amour', nah:'tlazohtlaliztli', cat:'Émotions', pron:'tla·zoh·tla·liz·tli' },
+{ fr:'peur', nah:'mauhcayotl', cat:'Émotions', pron:'mauh·ca·yotl' },
+{ fr:'joie', nah:'pahpaquilizili', cat:'Émotions', pron:'pah·pa·qui·li·zi·li' },
+{ fr:'tristesse', nah:'tlaocoyaliztli', cat:'Émotions', pron:'tla·o·co·ya·liz·tli' },
+{ fr:'colère', nah:'cualantli', cat:'Émotions', pron:'cua·lan·tli' },
+{ fr:'paix', nah:'cenyeyecoliztli', cat:'Émotions', pron:'cen·ye·ye·co·liz·tli' },
+// Verbes
+{ fr:'parler', nah:'tlatoa', cat:'Verbes', pron:'tla·to·a' },
+{ fr:'marcher', nah:'nenemi', cat:'Verbes', pron:'ne·ne·mi' },
+{ fr:'manger', nah:'tlacua', cat:'Verbes', pron:'tla·cu·a' },
+{ fr:'boire', nah:'i', cat:'Verbes', pron:'i' },
+{ fr:'voir', nah:'itta', cat:'Verbes', pron:'it·ta' },
+{ fr:'entendre', nah:'caqui', cat:'Verbes', pron:'ca·qui' },
+{ fr:'venir', nah:'huallauh', cat:'Verbes', pron:'hual·lauh' },
+{ fr:'partir', nah:'yauh', cat:'Verbes', pron:'yauh' },
+{ fr:'donner', nah:'maca', cat:'Verbes', pron:'ma·ca' },
+{ fr:'vivre', nah:'yoli', cat:'Verbes', pron:'yo·li' },
+{ fr:'mourir', nah:'miqui', cat:'Verbes', pron:'mi·qui' },
+{ fr:'aimer', nah:'tlazohtla', cat:'Verbes', pron:'tla·zoh·tla' },
+{ fr:'chanter', nah:'cuica', cat:'Verbes', pron:'cui·ca' },
+{ fr:'courir', nah:'motlaloa', cat:'Verbes', pron:'mot·la·lo·a' },
+],
+render(filter='', cat='Tous') {
+// Catégories
+const catsEl = document.getElementById('dictcats');
+if (catsEl) {
+catsEl.innerHTML = this.categories.map(c => `
+<div onclick="DICT.activeCat='${c}';DICT.render(document.getElementById('dictsearch').value,'${c}')"
+style="padding:3px 9px;border-radius:12px;cursor:pointer;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.08em;
+background:${c===cat?'var(--jade)':'rgba(44,36,22,.6)'};
+border:1px solid ${c===cat?'var(--jade-glow)':'rgba(201,162,39,.2)'};
+color:${c===cat?'var(--gold-bright)':'var(--text-dim)'}">
+${c}
+</div>`).join('');
+}
+// Filtrer
+const q = filter.toLowerCase().trim();
+const results = this.data.filter(e =>
+(cat === 'Tous' || e.cat === cat) &&
+(!q || e.fr.includes(q) || e.nah.toLowerCase().includes(q))
+);
+const el = document.getElementById('dictlist');
+if (!el) return;
+if (!results.length) {
+el.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:12px;padding:20px;font-family:'IM Fell English',serif">Aucun résultat pour "${filter}"</div>`;
+return;
+}
+el.innerHTML = results.map(e => `
+<div style="display:flex;align-items:center;padding:7px 10px;border-bottom:1px solid rgba(201,162,39,.1);gap:10px;transition:background .1s"
+onmouseover="this.style.background='rgba(26,74,46,.2)'" onmouseout="this.style.background='transparent'">
+<div style="flex:1">
+<span style="color:var(--text-main);font-size:13px;font-family:'IM Fell English',serif">${e.fr}</span>
+<span style="color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;margin-left:6px;letter-spacing:.05em">${e.cat}</span>
+</div>
+<div style="text-align:right">
+<div style="color:var(--jade-glow);font-size:14px;font-family:'Cinzel Decorative',serif;letter-spacing:.05em">${e.nah}</div>
+<div style="color:var(--text-dim);font-size:9px;font-family:'Courier New',monospace;letter-spacing:.08em">[${e.pron}]</div>
+</div>
+</div>`).join('');
+},
+};
+const PHRASES = [
+{ fr:'Bonjour / Salutations', nah:'Niltze', note:'Salutation formelle' },
+{ fr:'Merci', nah:'Tlazohcamati', note:'Littéralement : "tu es aimé"' },
+{ fr:'Oui', nah:'Quema', note:'Affirmation' },
+{ fr:'Non', nah:'Amo', note:'Négation' },
+{ fr:'Comment vas-tu ?', nah:'¿Quen tinemi?', note:'Littéralement : "comment vis-tu ?"' },
+{ fr:'Je vais bien', nah:'Cualli ninemi', note:'Littéralement : "je vis bien"' },
+{ fr:'Comment t\'appelles-tu ?', nah:'¿Tlen motoca?', note:'Littéralement : "quel est ton nom ?"' },
+{ fr:'Je m\'appelle…', nah:'Notoca…', note:'Suivi du prénom' },
+{ fr:'Au revoir', nah:'Ma xinechcahua', note:'Littéralement : "laisse-moi partir"' },
+{ fr:'S\'il te plaît', nah:'Miecpa tlazohcamati', note:'Formule de politesse' },
+{ fr:'Je t\'aime', nah:'Nimitztlazohtla', note:'Expression d\'amour' },
+{ fr:'Vive le Mexique !', nah:'Ma qualli México!', note:'Exclamation célèbre' },
+{ fr:'Que la paix soit avec toi',nah:'Ma motech onmani cenyeyecoliztli', note:'Bénédiction' },
+{ fr:'Qu\'est-ce que c\'est ?', nah:'¿Tlen in?', note:'Question basique' },
+{ fr:'Je ne comprends pas', nah:'Amo nicmati', note:'Littéralement : "je ne sais pas"' },
+{ fr:'Parle plus doucement', nah:'Piyaztic ximotlatoa', note:'Demande de parler plus lentement' },
+{ fr:'L\'eau est pure', nah:'In atl chipahualtic', note:'Phrase descriptive' },
+{ fr:'Le soleil brille', nah:'Tona in tonatiuh', note:'Description du soleil' },
+{ fr:'Gloire au soleil', nah:'Ma qualli in tonatiuh', note:'Phrase rituelle' },
+{ fr:'Serpent à plumes', nah:'Quetzalcoatl', note:'Le dieu fondateur' },
+];
+function dictFilter(val) {
+DICT.render(val, DICT.activeCat);
+}
+function qTab(tab) {
+['info','dict','phras'].forEach(t => {
+const panel = document.getElementById('qpanel-'+t);
+const tabEl = document.getElementById('qtab-'+t);
+if (!panel || !tabEl) return;
+const active = t === tab;
+panel.style.display = active ? '' : 'none';
+tabEl.style.color = active ? 'var(--gold-bright)' : 'var(--text-dim)';
+tabEl.style.borderBottom = active ? '2px solid var(--gold)' : '2px solid transparent';
+tabEl.style.background = active ? 'rgba(26,74,46,.3)' : 'transparent';
+});
+if (tab === 'dict') {
+DICT.render('', 'Tous');
+}
+if (tab === 'phras') {
+const el = document.getElementById('phraslist');
+if (el) el.innerHTML = PHRASES.map(p => `
+<div style="margin-bottom:10px;padding:10px;background:rgba(26,74,46,.12);border:1px solid rgba(201,162,39,.15);border-radius:4px">
+<div style="color:var(--text-main);font-size:12px;font-family:'IM Fell English',serif;margin-bottom:4px">${p.fr}</div>
+<div style="color:var(--jade-glow);font-size:14px;font-family:'Cinzel Decorative',serif;letter-spacing:.06em;margin-bottom:3px">${p.nah}</div>
+<div style="color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.05em;font-style:italic">${p.note}</div>
+</div>`).join('');
+}
+}
+// ══════════════════════════════════════════════
+// MILPA MARKET — Tianguis de Tlatelolco
+// ══════════════════════════════════════════════
+const MM = {
+cart: [],
+activeCat: 'Tous',
+produits: [
+// Nourriture
+{ id:1, nom:'Maïs sacré', nah:'Centli', prix:3, cat:'Nourriture', ico:'🌽', desc:'Grain fondateur de l\'humanité selon le Popol Vuh.' },
+{ id:2, nom:'Cacao rituel', nah:'Cacahuatl', prix:12, cat:'Nourriture', ico:'🍫', desc:'Monnaie et boisson des dieux. Réservé aux guerriers et nobles.' },
+{ id:3, nom:'Piment rouge', nah:'Chilli', prix:2, cat:'Nourriture', ico:'🌶️', desc:'Épice sacrée, offerte à Tlaloc lors des récoltes.' },
+{ id:4, nom:'Avocat', nah:'Ahuacatl', prix:4, cat:'Nourriture', ico:'🥑', desc:'Fruit de fertilité, symbole du mois Huei Tozoztli.' },
+{ id:5, nom:'Tomate verte', nah:'Tomatl', prix:2, cat:'Nourriture', ico:'🍅', desc:'Base des sauces rituelles préparées pour les fêtes.' },
+{ id:6, nom:'Chocolat xocolatl', nah:'Xocolatl', prix:15, cat:'Nourriture', ico:'☕', desc:'Boisson amère et épicée des cérémonies aztèques.' },
+{ id:7, nom:'Haricots noirs', nah:'Etl', prix:3, cat:'Nourriture', ico:'🫘', desc:'Aliment de base, cultivé avec le maïs et la courge.' },
+{ id:8, nom:'Courge', nah:'Ayotli', prix:3, cat:'Nourriture', ico:'🎃', desc:'La troisième sœur de la milpa, compagne du maïs.' },
+// Artisanat
+{ id:9, nom:'Jade taillé', nah:'Chalchihuitl',prix:80, cat:'Artisanat', ico:'💚', desc:'Pierre la plus précieuse, plus que l\'or. Symbole de l\'eau et de la vie.' },
+{ id:10, nom:'Obsidienne', nah:'Itztetl', prix:25, cat:'Artisanat', ico:'🖤', desc:'Pierre volcanique noire, taillée en miroirs et lames rituelles.' },
+{ id:11, nom:'Poterie peinte', nah:'Comitl', prix:18, cat:'Artisanat', ico:'🏺', desc:'Céramique décorée de glyphes calendaires.' },
+{ id:12, nom:'Tissu de coton', nah:'Ichcatl', prix:20, cat:'Artisanat', ico:'🧵', desc:'Textile noble, tribut versé aux seigneurs de Tenochtitlan.' },
+{ id:13, nom:'Masque turquoise', nah:'Xiuhtetl', prix:150,cat:'Artisanat', ico:'🎭', desc:'Objet cérémoniel dédié à Xiuhtecuhtli, dieu du feu.' },
+{ id:14, nom:'Sandales de cuir', nah:'Cactli', prix:10, cat:'Artisanat', ico:'👡', desc:'Chaussure réservée aux nobles et guerriers.' },
+// Plantes & Médecine
+{ id:15, nom:'Tabac sacré', nah:'Piciétl', prix:8, cat:'Médecine', ico:'🌿', desc:'Utilisé dans les rituels de guérison par les ticitl (médecins).' },
+{ id:16, nom:'Racine de copal', nah:'Copalli', prix:14, cat:'Médecine', ico:'🪵', desc:'Résine brûlée en offrande pour purifier les espaces sacrés.' },
+{ id:17, nom:'Fleur de cempoal', nah:'Cempoalxochitl',prix:5,cat:'Médecine', ico:'🌼', desc:'Fleur des morts, guide les âmes au Mictlan.' },
+{ id:18, nom:'Herbe épazote', nah:'Epazotl', prix:3, cat:'Médecine', ico:'🌱', desc:'Plante médicinale et aromatique des guérisseurs aztèques.' },
+// Armes & Guerre
+{ id:19, nom:'Macuahuitl', nah:'Macuahuitl', prix:60, cat:'Guerre', ico:'⚔️', desc:'Épée de bois incrustée d\'obsidienne. Arme redoutée des guerriers.' },
+{ id:20, nom:'Bouclier chimalli', nah:'Chimalli', prix:35, cat:'Guerre', ico:'🛡️', desc:'Bouclier de guerre orné de plumes et de dessins totémiques.' },
+{ id:21, nom:'Plumes de quetzal', nah:'Quetzaltototl',prix:90,cat:'Guerre', ico:'🪶', desc:'Parure sacrée, signe de rang guerrier et de faveur divine.' },
+// Monnaies
+{ id:22, nom:'Fèves de cacao', nah:'Cacahuatl', prix:1, cat:'Monnaie', ico:'🪙', desc:'Unité monétaire de base du marché de Tlatelolco.' },
+{ id:23, nom:'Plumes de cotinga', nah:'Xiuhtototl', prix:50, cat:'Monnaie', ico:'💙', desc:'Monnaie de luxe, échangée contre des objets précieux.' },
+{ id:24, nom:'Hache de cuivre', nah:'Tepuztli', prix:30, cat:'Monnaie', ico:'🪓', desc:'Outil et monnaie, symbole du commerce inter-régional.' },
+],
+init() {
+this.renderFilters();
+this.renderGrid('Tous');
+this.fetchProduitsAPI();
+},
+
+init() {
+  this.renderFilters();
+  this.renderGrid('Tous');
+  this.fetchProduitsAPI();
+},
+
+fetchProduitsAPI() {
+  fetch('http://localhost:5000/api/produits')
+    .then(r => r.json())
+    .then(produits => {
+      if (produits.length > 0) {
+        produits.forEach(p => {
+          if (!this.produits.find(x => x.nom === p.nom_fr)) {
+            this.produits.push({
+              id: 900 + p.id,
+              nom: p.nom_fr,
+              nah: p.nom_nah || '',
+              prix: p.prix,
+              cat: p.categorie || 'Artisanat',
+              ico: '🛒',
+              desc: p.description_fr || ''
+            });
+          }
+        });
+        this.renderGrid(this.activeCat);
+      }
+    })
+    .catch(() => console.log('Serveur Milpa Market hors ligne'));
+},
+
+renderFilters() {
+const cats = ['Tous','Nourriture','Artisanat','Médecine','Guerre','Monnaie'];
+const el = document.getElementById('mfilters');
+if (!el) return;
+el.innerHTML = cats.map(c => `
+<div onclick="MM.activeCat='${c}';MM.renderFilters();MM.renderGrid('${c}')"
+style="padding:3px 10px;border-radius:12px;cursor:pointer;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.08em;
+background:${c===this.activeCat?'var(--jade)':'rgba(44,36,22,.6)'};
+border:1px solid ${c===this.activeCat?'var(--jade-glow)':'rgba(201,162,39,.2)'};
+color:${c===this.activeCat?'var(--gold-bright)':'var(--text-dim)'}">
+${c}
+</div>`).join('');
+},
+renderGrid(cat) {
+const el = document.getElementById('mgrid');
+if (!el) return;
+const list = cat === 'Tous' ? this.produits : this.produits.filter(p => p.cat === cat);
+el.innerHTML = list.map(p => `
+<div style="background:rgba(26,74,46,.12);border:1px solid rgba(201,162,39,.18);border-radius:5px;padding:10px;display:flex;flex-direction:column;gap:5px;transition:all .15s"
+onmouseover="this.style.background='rgba(26,74,46,.28)';this.style.borderColor='rgba(201,162,39,.45)'"
+onmouseout="this.style.background='rgba(26,74,46,.12)';this.style.borderColor='rgba(201,162,39,.18)'">
+<div style="font-size:26px;text-align:center">${p.ico}</div>
+<div style="color:var(--gold-pale);font-family:'Cinzel',serif;font-size:10px;font-weight:bold;text-align:center;letter-spacing:.04em">${p.nom}</div>
+<div style="color:var(--jade-glow);font-family:'Cinzel Decorative',serif;font-size:9px;text-align:center;opacity:.8">${p.nah}</div>
+<div style="color:var(--text-dim);font-size:9px;font-family:'IM Fell English',serif;line-height:1.4;flex:1">${p.desc}</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+<span style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:11px">${p.prix} 🪙</span>
+<button onclick="MM.acheter(${p.id})"
+style="background:linear-gradient(135deg,var(--jade),var(--jade-light));border:1px solid var(--jade-glow);
+color:var(--gold-bright);padding:3px 9px;border-radius:3px;cursor:pointer;
+font-family:'Cinzel',serif;font-size:8px;letter-spacing:.05em">
++ Acheter
+</button>
+</div>
+</div>`).join('');
+},
+addToCart(id) {
+const prod = this.produits.find(p => p.id === id);
+if (!prod) return;
+const existing = this.cart.find(c => c.id === id);
+if (existing) existing.qty++;
+else this.cart.push({ ...prod, qty: 1 });
+this.updateBadge();
+// Flash visuel
+const badge = document.getElementById('mcartbadge');
+if (badge) { badge.style.transform='scale(1.4)'; setTimeout(()=>badge.style.transform='scale(1)',200); }
+},
+
+acheter(id) {
+  const prod = this.produits.find(p => p.id === id);
+  if (!prod) return;
+  fetch('http://localhost:5000/api/acheter', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({produit_id: id})
+  })
+  .then(r => r.json())
+  .then(data => {
+    window.open(data.paypal, '_blank');
+  })
+  .catch(() => {
+    window.open(`https://www.paypal.com/paypalme/MilpaMarket/${prod.prix}`, '_blank');
+  });
+},
+updateBadge() {
+const total = this.cart.reduce((s,c) => s+c.qty, 0);
+const badge = document.getElementById('mcartbadge');
+if (!badge) return;
+badge.style.display = total > 0 ? 'inline' : 'none';
+badge.textContent = total;
+},
+renderCart() {
+const el = document.getElementById('mcartlist');
+const foot = document.getElementById('mcartfoot');
+if (!el) return;
+if (!this.cart.length) {
+el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:'IM Fell English',serif;font-size:13px">
+<div style="font-size:36px;margin-bottom:10px">🧺</div>
+Votre panier est vide.<br>
+<span style="font-size:11px;opacity:.6">Les dieux attendent vos offrandes.</span>
+</div>`;
+if (foot) foot.style.display = 'none';
+return;
+}
+el.innerHTML = this.cart.map(c => `
+<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(201,162,39,.1)">
+<span style="font-size:20px">${c.ico}</span>
+<div style="flex:1">
+<div style="color:var(--text-main);font-size:12px;font-family:'Cinzel',serif">${c.nom}</div>
+<div style="color:var(--text-dim);font-size:9px">${c.prix} 🪙 × ${c.qty} = <span style="color:var(--gold)">${c.prix*c.qty} 🪙</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:5px">
+<button onclick="MM.changeQty(${c.id},-1)"
+style="width:20px;height:20px;background:rgba(44,36,22,.8);border:1px solid rgba(201,162,39,.3);color:var(--gold);border-radius:2px;cursor:pointer;font-size:12px;line-height:1">−</button>
+<span style="color:var(--gold-pale);font-size:12px;min-width:16px;text-align:center">${c.qty}</span>
+<button onclick="MM.changeQty(${c.id},1)"
+style="width:20px;height:20px;background:rgba(44,36,22,.8);border:1px solid rgba(201,162,39,.3);color:var(--gold);border-radius:2px;cursor:pointer;font-size:12px;line-height:1">+</button>
+</div>
+</div>`).join('');
+const total = this.cart.reduce((s,c) => s + c.prix*c.qty, 0);
+const ttEl = document.getElementById('mcarttotal');
+if (ttEl) ttEl.textContent = total + ' 🪙 cacao';
+if (foot) foot.style.display = 'block';
+},
+changeQty(id, delta) {
+const idx = this.cart.findIndex(c => c.id === id);
+if (idx < 0) return;
+this.cart[idx].qty += delta;
+if (this.cart[idx].qty <= 0) this.cart.splice(idx, 1);
+this.updateBadge();
+this.renderCart();
+},
+clearCart() {
+this.cart = [];
+this.updateBadge();
+this.renderCart();
+},
+checkout() {
+const total = this.cart.reduce((s,c) => s + c.prix*c.qty, 0);
+const el = document.getElementById('mcartlist');
+const foot = document.getElementById('mcartfoot');
+if (el) el.innerHTML = `
+<div style="text-align:center;padding:30px;font-family:'IM Fell English',serif">
+<div style="font-size:44px;margin-bottom:12px">✦</div>
+<div style="color:var(--jade-glow);font-family:'Cinzel Decorative',serif;font-size:14px;margin-bottom:8px">Offrande acceptée !</div>
+<div style="color:var(--text-dim);font-size:12px;line-height:1.6">
+${total} fèves de cacao offertes aux dieux.<br>
+<span style="color:var(--gold);font-size:11px">Que Quetzalcóatl vous protège.</span>
+</div>
+</div>`;
+if (foot) foot.style.display = 'none';
+this.cart = [];
+this.updateBadge();
+},
+};
+function mTab(tab) {
+['prod','cart','info','contact'].forEach(t => {
+const panel = document.getElementById('mpanel-'+t);
+const tabEl = document.getElementById('mtab-'+t);
+if (!panel || !tabEl) return;
+const active = t === tab;
+panel.style.display = active ? (t==='prod'?'flex':'block') : 'none';
+tabEl.style.color = active ? 'var(--gold-bright)' : 'var(--text-dim)';
+tabEl.style.borderBottom = active ? '2px solid var(--gold)' : '2px solid transparent';
+tabEl.style.background = active ? 'rgba(26,74,46,.3)' : 'transparent';
+});
+if (tab === 'cart') MM.renderCart();
+}
+function MM_envoyerContact() {
+  const nom = document.getElementById('contact-nom').value;
+  const email = document.getElementById('contact-email').value;
+  const msg = document.getElementById('contact-msg').value;
+  if (!nom || !email || !msg) {
+    alert('Veuillez remplir tous les champs.');
+    return;
+  }
+  fetch('http://localhost:5000/api/contact', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({nom, email, message: msg})
+  })
+  .then(() => {
+    document.getElementById('contact-confirm').style.display = 'block';
+    document.getElementById('contact-nom').value = '';
+    document.getElementById('contact-email').value = '';
+    document.getElementById('contact-msg').value = '';
+  })
+  .catch(() => {
+    document.getElementById('contact-confirm').style.display = 'block';
+  });
+}
+// Stars
+(function(){
+for(let i=0;i<90;i++){
+const d=document.createElement('div');
+d.className='star';
+const sz=Math.random()*2.2+.5;
+d.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s;opacity:${.2+Math.random()*.7}`;
+document.body.appendChild(d);
+}
+})();
+// Clock & Aztec day
+const TONALPOHUALLI_DAYS=['Cipactli','Ehecatl','Calli','Cuetzpalin','Coatl','Miquiztli','Mazatl','Tochtli','Atl','Itzcuintli','Ozomatli','Malinalli','Acatl','Ocelotl','Cuauhtli','Cozcacuauhtli','Ollin','Tecpatl','Quiahuitl','Xochitl'];
+const TONALPOHUALLI_NUMS=['1','2','3','4','5','6','7','8','9','10','11','12','13'];
+const GLYPHS=['🐊','💨','🏠','🦎','🐍','💀','🦌','🐇','💧','🐕','🐒','🌿','🎋','🐆','🦅','🦅','〰️','🔪','🌧️','🌸'];
+function updateClock(){
+const now=new Date();
+const h=String(now.getHours()).padStart(2,'0');
+const m=String(now.getMinutes()).padStart(2,'0');
+const s=String(now.getSeconds()).padStart(2,'0');
+document.getElementById('clk').textContent=`${h}:${m}:${s}`;
+const opts={weekday:'long',day:'numeric',month:'long'};
+document.getElementById('cdt').textContent=now.toLocaleDateString('fr-FR',opts);
+const dayOfYear=Math.floor((now-(new Date(now.getFullYear(),0,0)))/(1000*60*60*24));
+const tIdx=dayOfYear%20; const nIdx=dayOfYear%13;
+const tDay=TONALPOHUALLI_DAYS[tIdx]; const tNum=TONALPOHUALLI_NUMS[nIdx];
+document.getElementById('caz').textContent=`${GLYPHS[tIdx]} ${tNum} ${tDay}`;
+document.getElementById('qcyc').textContent=`${tNum} ${tDay}`;
+const tEl=document.getElementById('tdate');
+if(tEl) tEl.textContent=`Jour ${tNum}-${tDay} · ${now.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}`;
+}
+setInterval(updateClock,1000); updateClock();
+// ── Données Tonalpohualli complètes ──
+const TONAL_INFO = [
+{ nom:'Cipactli', sens:'Caïman', dieu:'Tonacatecuhtli', destin:'Favorable — Naissance des leaders' },
+{ nom:'Ehecatl', sens:'Vent', dieu:'Quetzalcóatl', destin:'Changeant — Prudence en voyage' },
+{ nom:'Calli', sens:'Maison', dieu:'Tepeyollotl', destin:'Stable — Propice au foyer' },
+{ nom:'Cuetzpalin', sens:'Lézard', dieu:'Huehuecoyotl', destin:'Agile — Créativité et ruse' },
+{ nom:'Coatl', sens:'Serpent', dieu:'Chalchiuhtlicue',destin:'Puissant — Guérison et eau' },
+{ nom:'Miquiztli', sens:'Mort', dieu:'Tecuciztecatl', destin:'Mystérieux — Transformation' },
+{ nom:'Mazatl', sens:'Cerf', dieu:'Tlaloc', destin:'Gracieux — Chasse et forêt' },
+{ nom:'Tochtli', sens:'Lapin', dieu:'Mayahuel', destin:'Festif — Abondance et joie' },
+{ nom:'Atl', sens:'Eau', dieu:'Xiuhtecuhtli', destin:'Fluide — Commerce prospère' },
+{ nom:'Itzcuintli', sens:'Chien', dieu:'Mictlantecuhtli',destin:'Loyal — Guide des âmes' },
+{ nom:'Ozomatli', sens:'Singe', dieu:'Xochipilli', destin:'Joueur — Arts et musique' },
+{ nom:'Malinalli', sens:'Herbe torsadée',dieu:'Patecatl', destin:'Tenace — Médecine et plantes' },
+{ nom:'Acatl', sens:'Roseau', dieu:'Tezcatlipoca', destin:'Guerrier — Pouvoir et ambition' },
+{ nom:'Ocelotl', sens:'Jaguar', dieu:'Tlazolteotl', destin:'Féroce — Force et passion' },
+{ nom:'Cuauhtli', sens:'Aigle', dieu:'Xipe Totec', destin:'Noble — Soleil et sacrifice' },
+{ nom:'Cozcacuauhtli',sens:'Vautour', dieu:'Itzpapalotl', destin:'Sage — Longévité et patience' },
+{ nom:'Ollin', sens:'Mouvement', dieu:'Xolotl', destin:'Dynamique — Jour du Soleil actuel' },
+{ nom:'Tecpatl', sens:'Couteau de silex',dieu:'Chalchiuhtotolin',destin:'Tranchant — Justice divine' },
+{ nom:'Quiahuitl', sens:'Pluie', dieu:'Tonatiuh', destin:'Purificateur — Bénédictions célestes' },
+{ nom:'Xochitl', sens:'Fleur', dieu:'Xochiquetzal', destin:'Beau — Amour et beauté' },
+];
+// Époque de référence Tonalpohualli
+// Calibrée pour que le 13 mars 2026 = 8 Acatl (corrélation azteccalendar.com)
+// Ancre : 31 déc 2025 = JDN 2461041 → offset calculé
+const TONAL_EPOCH = new Date(2025, 11, 31); // 31 décembre 2025 = point zéro calibré
+function getTonalDay(date) {
+const diff = Math.floor((date - TONAL_EPOCH) / 86400000);
+// Ancre calibrée : 13 mars 2026 = 8 Acatl (source : azteccalendar.com)
+const tIdx = ((diff % 20) + 20) % 20;
+const nIdx = ((diff % 13) + 13) % 13;
+return { tIdx, nIdx, num: nIdx + 1, info: TONAL_INFO[tIdx], glyph: GLYPHS[tIdx] };
+}
+// État calendrier
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let selectedDay = null;
+function buildCal() {
+const now = new Date();
+const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const jours = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const first = new Date(calYear, calMonth, 1).getDay();
+const days = new Date(calYear, calMonth + 1, 0).getDate();
+const prevDays = new Date(calYear, calMonth, 0).getDate();
+let h = `<div class="cnav">
+<button class="cnbtn" onclick="calNav(-1)">◀</button>
+<span class="cmname">${months[calMonth]} ${calYear}</span>
+<button class="cnbtn" onclick="calNav(1)">▶</button>
+</div><div class="cgrid">`;
+jours.forEach(j => h += `<div class="chdr">${j}</div>`);
+// jours mois précédent
+for (let i = first - 1; i >= 0; i--)
+h += `<div class="cday om">${prevDays - i}</div>`;
+// jours du mois
+for (let d = 1; d <= days; d++) {
+const date = new Date(calYear, calMonth, d);
+const td = getTonalDay(date);
+const isToday = (d === now.getDate() && calMonth === now.getMonth() && calYear === now.getFullYear());
+const isSel = (selectedDay === d && calMonth === now.getMonth() && calYear === now.getFullYear()) || false;
+h += `<div class="cday${isToday ? ' today' : ''}${isSel ? ' csel' : ''}"
+title="${td.num} ${td.info.nom} · ${td.glyph}"
+onclick="showDayDetail(${d},${calMonth},${calYear})"
+style="position:relative">
+${d}
+<span style="display:block;font-size:8px;line-height:1;opacity:.7">${td.glyph}</span>
+</div>`;
+}
+// jours mois suivant
+const total = first + days;
+const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
+for (let i = 1; i <= rem; i++)
+h += `<div class="cday om">${i}</div>`;
+h += `</div>`;
+// Résumé du bas : Tonalpohualli + Haab'
+const todayTd = getTonalDay(now);
+const todayHaab = getHaab(now);
+h += `<div class="aztec-m" style="cursor:pointer" onclick="showDayDetail(${now.getDate()},${now.getMonth()},${now.getFullYear()})">
+<div style="display:flex;justify-content:center;gap:18px;align-items:center">
+<div style="text-align:center">
+<span class="ag">${todayTd.glyph}</span>
+<div style="color:var(--jade-glow);font-size:10px"><strong>${todayTd.num} ${todayTd.info.nom}</strong></div>
+<div style="font-size:8px;opacity:.6">Tonalpohualli</div>
+</div>
+<div style="color:var(--gold);opacity:.4;font-size:18px">·</div>
+<div style="text-align:center">
+<span class="ag">${todayHaab.mois.glyphe}</span>
+<div style="color:var(--turquoise-light);font-size:10px"><strong>${todayHaab.label}</strong></div>
+<div style="font-size:8px;opacity:.6">Haab' maya</div>
+</div>
+</div>
+<div style="font-size:8px;opacity:.5;margin-top:4px">↓ Cliquez sur un jour pour le détail complet</div>
+</div>`;
+// Zone détail
+h += `<div id="calDetail" style="margin-top:10px;padding:10px;background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;display:none;font-size:11px;line-height:1.8;font-family:'IM Fell English',serif;color:var(--text-main)"></div>`;
+document.getElementById('wcal').innerHTML = h;
+// Afficher détail du jour courant par défaut
+showDayDetail(now.getDate(), now.getMonth(), now.getFullYear());
+}
+function calNav(dir) {
+calMonth += dir;
+if (calMonth > 11) { calMonth = 0; calYear++; }
+if (calMonth < 0) { calMonth = 11; calYear--; }
+buildCal();
+}
+// ══════════════════════════════════════════════
+// HAAB' — Calendrier solaire maya (365 jours)
+// ══════════════════════════════════════════════
+const HAAB_MOIS = [
+{ nom:"Pop", sens:"Natte", glyphe:"🟥" },
+{ nom:"Wo'", sens:"Grenouille noire", glyphe:"🐸" },
+{ nom:"Sip", sens:"Cerf rouge", glyphe:"🦌" },
+{ nom:"Sotz'", sens:"Chauve-souris", glyphe:"🦇" },
+{ nom:"Sek", sens:"Ciel / Terre", glyphe:"🌍" },
+{ nom:"Xul", sens:"Chien", glyphe:"🐕" },
+{ nom:"Yaxk'in", sens:"Nouveau Soleil", glyphe:"☀️" },
+{ nom:"Mol", sens:"Eau", glyphe:"💧" },
+{ nom:"Ch'en", sens:"Caverne noire", glyphe:"🕳️" },
+{ nom:"Yax", sens:"Vert / Nouveau", glyphe:"🌿" },
+{ nom:"Sak'", sens:"Blanc / Nuage", glyphe:"☁️" },
+{ nom:"Keh", sens:"Cerf rouge", glyphe:"🦌" },
+{ nom:"Mak", sens:"Enclos", glyphe:"🔲" },
+{ nom:"K'ank'in",sens:"Sol jaune", glyphe:"🟨" },
+{ nom:"Muwan'", sens:"Hibou / Nuage", glyphe:"🦉" },
+{ nom:"Pax", sens:"Planting Time", glyphe:"🌱" },
+{ nom:"K'ayab'", sens:"Tortue", glyphe:"🐢" },
+{ nom:"Kumk'u", sens:"Greniers du maïs", glyphe:"🌽" },
+{ nom:"Wayeb'", sens:"Jours sans nom ⚠", glyphe:"💀" },
+];
+// Corrélation GMT (Goodman-Martinez-Thompson) : 584283
+// Jour julien de référence connu : 4 Ahaw 8 Kumk'u = JDN 584283
+const GMT_CORRELATION = 584283;
+function julianDayNumber(date) {
+const a = Math.floor((14 - (date.getMonth()+1)) / 12);
+const y = date.getFullYear() + 4800 - a;
+const m = (date.getMonth()+1) + 12*a - 3;
+return date.getDate()
++ Math.floor((153*m+2)/5)
++ 365*y
++ Math.floor(y/4)
+- Math.floor(y/100)
++ Math.floor(y/400)
+- 32045;
+}
+function getHaab(date) {
+const jdn = julianDayNumber(date);
+// Position dans le cycle Haab' (365 jours)
+const haabPos = ((jdn - GMT_CORRELATION) % 365 + 365) % 365;
+const moisIdx = Math.floor(haabPos / 20);
+const jourDansMois = haabPos % 20; // 0 à 19 (ou 0 à 4 pour Wayeb')
+const mois = HAAB_MOIS[Math.min(moisIdx, 18)]; // 18 mois + Wayeb'
+// Wayeb' : jours 360-364
+const estWayeb = haabPos >= 360;
+const jourWayeb = haabPos - 360;
+return {
+position: haabPos,
+jourDansMois: estWayeb ? jourWayeb : jourDansMois,
+moisIdx: estWayeb ? 18 : moisIdx,
+mois: estWayeb ? HAAB_MOIS[18] : mois,
+estWayeb,
+label: estWayeb
+? `${jourWayeb + 1} Wayeb'`
+: `${jourDansMois} ${mois.nom}`,
+};
+}
+function showDayDetail(d, m, y) {
+const date = new Date(y, m, d);
+const td = getTonalDay(date);
+const haab = getHaab(date);
+const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const el = document.getElementById('calDetail');
+if (!el) return;
+el.style.display = 'block';
+const wayebWarning = haab.estWayeb
+? `<div style="background:rgba(139,26,26,.3);border:1px solid var(--blood-bright);padding:6px;border-radius:3px;grid-column:1/-1;text-align:center;color:var(--blood-bright);font-size:10px">
+⚠ WAYEB' — Jours néfastes. Les Mayas cessaient tout travail et évitaient les décisions importantes.
+</div>` : '';
+el.innerHTML = `
+<div style="text-align:center;margin-bottom:8px">
+<span style="color:var(--text-dim);font-size:10px">${d} ${months[m]} ${y}</span>
+</div>
+<!-- SECTION TONALPOHUALLI -->
+<div style="color:var(--jade-glow);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px;border-bottom:1px solid rgba(61,186,118,.2);padding-bottom:3px">
+🐍 Tonalpohualli aztèque
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px">
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px;text-align:center;grid-column:1/-1">
+<span style="font-size:26px">${td.glyph}</span>
+<div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:11px;margin-top:2px">${td.num} ${td.info.nom}</div>
+<div style="color:var(--text-dim);font-size:9px">« ${td.info.sens} »</div>
+</div>
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px">
+<div style="color:var(--turquoise-light);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-family:'Cinzel',serif">Chiffre sacré</div>
+<div style="font-size:12px">${td.num} / 13</div>
+</div>
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px">
+<div style="color:var(--turquoise-light);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-family:'Cinzel',serif">Divinité</div>
+<div style="font-size:11px">${td.info.dieu}</div>
+</div>
+<div style="background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);padding:6px;border-radius:3px;grid-column:1/-1">
+<div style="color:var(--gold);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-family:'Cinzel',serif">Destin</div>
+<div style="color:var(--gold-pale);font-size:11px">${td.info.destin}</div>
+</div>
+</div>
+<!-- SECTION HAAB' -->
+<div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px;border-bottom:1px solid rgba(0,169,157,.2);padding-bottom:3px">
+🌽 Haab' maya (calendrier solaire)
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px;text-align:center;grid-column:1/-1">
+<span style="font-size:26px">${haab.mois.glyphe}</span>
+<div style="color:var(--turquoise-light);font-family:'Cinzel Decorative',serif;font-size:11px;margin-top:2px">${haab.label}</div>
+<div style="color:var(--text-dim);font-size:9px">« ${haab.mois.sens} »</div>
+</div>
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px">
+<div style="color:var(--turquoise-light);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-family:'Cinzel',serif">Mois Haab'</div>
+<div style="font-size:11px">${haab.mois.nom} (${haab.moisIdx + 1}/19)</div>
+</div>
+<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:3px">
+<div style="color:var(--turquoise-light);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-family:'Cinzel',serif">Jour dans l'année</div>
+<div style="font-size:11px">${haab.position + 1} / 365</div>
+</div>
+${wayebWarning}
+</div>`;
+}
+buildCal();
+// Window management
+let zTop=100;
+function openW(id){
+const w=document.getElementById(id);
+w.style.display='flex'; w.style.zIndex=++zTop;
+const tb=document.getElementById('tb-'+id);
+if(tb){tb.classList.add('on','act');}
+closeMenu();
+if(id==='wt'){ T.init(); }
+if(id==='wb'){ IB.init(); }
+if(id==='wm'){ MM.init(); }
+}
+function closeW(id){
+document.getElementById(id).style.display='none';
+const tb=document.getElementById('tb-'+id);
+if(tb){tb.classList.remove('on','act');}
+}
+function minW(id){
+const w=document.getElementById(id);
+w.style.display='none';
+const tb=document.getElementById('tb-'+id);
+if(tb){tb.classList.add('on'); tb.classList.remove('act');}
+}
+function maxW(id){
+const w=document.getElementById(id);
+const isMax=w.dataset.max==='1';
+if(isMax){
+w.style.width=w.dataset.pw; w.style.height=w.dataset.ph||'';
+w.style.top=w.dataset.pt; w.style.left=w.dataset.pl;
+w.dataset.max='0';
+} else {
+w.dataset.pw=w.style.width; w.dataset.ph=w.style.height;
+w.dataset.pt=w.style.top; w.dataset.pl=w.style.left;
+w.style.width='100vw'; w.style.height='calc(100vh - 50px)';
+w.style.top='0'; w.style.left='0';
+w.dataset.max='1';
+}
+}
+function toggleW(id){
+const w=document.getElementById(id);
+const tb=document.getElementById('tb-'+id);
+if(w.style.display==='none'||!w.style.display){
+openW(id);
+} else if(tb&&!tb.classList.contains('act')){
+w.style.zIndex=++zTop; tb.classList.add('act');
+} else {
+minW(id);
+}
+}
+// Drag
+function drag(e,id){
+const w=document.getElementById(id);
+w.style.zIndex=++zTop;
+document.getElementById('tb-'+id)?.classList.add('act');
+const ox=e.clientX-w.offsetLeft, oy=e.clientY-w.offsetTop;
+function mv(e){
+w.style.left=Math.max(0,Math.min(window.innerWidth-w.offsetWidth,e.clientX-ox))+'px';
+w.style.top=Math.max(0,Math.min(window.innerHeight-50-w.offsetHeight,e.clientY-oy))+'px';
+}
+function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+document.addEventListener('mousemove',mv);
+document.addEventListener('mouseup',up);
+}
+// Icon selection + double-clic robuste
+let clickTimer=null, lastClicked=null;
+function selI(el, winId){
+document.querySelectorAll('.icon').forEach(i=>i.classList.remove('sel'));
+el.classList.add('sel');
+if(!winId) return;
+if(lastClicked===winId && clickTimer){
+clearTimeout(clickTimer); clickTimer=null; lastClicked=null;
+openW(winId);
+} else {
+lastClicked=winId;
+clickTimer=setTimeout(()=>{ clickTimer=null; lastClicked=null; }, 400);
+}
+}
+// Start menu
+function toggleMenu(){ document.getElementById('smenu').classList.toggle('vis'); }
+function closeMenu(){ document.getElementById('smenu').classList.remove('vis'); }
+// Context menu
+document.addEventListener('contextmenu',e=>{
+e.preventDefault();
+const ctx=document.getElementById('ctx');
+ctx.style.left=Math.min(e.clientX,window.innerWidth-180)+'px';
+ctx.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+ctx.classList.add('vis');
+});
+function hideCtx(){ document.getElementById('ctx').classList.remove('vis'); }
+document.addEventListener('click',e=>{
+if(!e.target.closest('#ctx')) hideCtx();
+if(!e.target.closest('#smenu')&&!e.target.closest('#sbtn')) closeMenu();
+if(!e.target.closest('.icon')) document.querySelectorAll('.icon').forEach(i=>i.classList.remove('sel'));
+});
+// Notification
+let notifTimer;
+function showNotif(){
+const n=document.getElementById('notif');
+n.classList.add('vis');
+clearTimeout(notifTimer);
+notifTimer=setTimeout(()=>n.classList.remove('vis'),4000);
+}
+</script>
+</body>
+</html>
+

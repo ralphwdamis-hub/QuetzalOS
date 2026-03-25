@@ -1,10 +1,8 @@
 import asyncio
 import websockets
 import subprocess
-import os
 
 async def handle(websocket):
-    print("Client connecté")
     process = await asyncio.create_subprocess_shell(
         'bash',
         stdin=asyncio.subprocess.PIPE,

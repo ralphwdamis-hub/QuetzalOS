@@ -23,9 +23,7 @@ Password : live
 git clone https://github.com/ralphwdamis-hub/QuetzalOS.git
 
 ###Étape 5 — Lancer QuetzalOS
-cd QuetzalOS/olmec-shell
-sudo apt install nodejs npm -y
-npx electron .
+~/QuetzalOS/start.sh
 
 ###Basé sur
 Parrot OS Security 6.x

@@ -930,6 +930,18 @@ ws.onmessage = function(event) {
   d.innerHTML = '<span class="to">' + event.data.replace(/</g,'&lt;') + '</span>';
   out.appendChild(d);
   out.scrollTop = out.scrollHeight;
+  
+  // Signal de fin — Quetzalcóatl
+  const existing = document.getElementById('qsignal');
+  if (existing) existing.remove();
+  const q = document.createElement('div');
+  q.id = 'qsignal';
+  q.style.cssText = 'text-align:center;padding:4px;opacity:.6';
+  q.innerHTML = '<svg width="24" height="24" viewBox="0 0 40 40"><use href="#qico"/></svg>';
+  out.appendChild(q);
+  out.scrollTop = out.scrollHeight;
+};
+  
 };
 
 function sendToTerminal(cmd) {

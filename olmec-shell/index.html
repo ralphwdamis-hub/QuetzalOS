@@ -931,7 +931,6 @@ ws.onmessage = function(event) {
   out.appendChild(d);
   out.scrollTop = out.scrollHeight;
 };
-
 function sendToTerminal(cmd) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(cmd);

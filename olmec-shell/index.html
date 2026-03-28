@@ -1962,6 +1962,16 @@ if(id==='wt'){ T.init(); }
 if(id==='wb'){ IB.init(); }
 if(id==='wm'){ MM.init(); }
 }
+function openW(id){
+  const w=document.getElementById(id);
+  w.style.display='flex'; w.style.zIndex=++zTop;
+  const tb=document.getElementById('tb-'+id);
+  if(tb){tb.classList.add('on','act');}
+  closeMenu();
+  if(id==='wt'){ T.init(); }
+  if(id==='wb'){ IB.init(); }
+  if(id==='wm'){ MM.init(); }
+}
 function closeW(id){
 document.getElementById(id).style.display='none';
 const tb=document.getElementById('tb-'+id);

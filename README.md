@@ -1,28 +1,28 @@
 # 🐍 QuetzalOS
-
-> Première distribution Linux à thème aztèque, basée sur Parrot OS Security — Version 1.0 Beta
-
-## Description
-QuetzalOS est une distribution Linux orientée sécurité informatique,
-habillée d'un thème aztèque complet. Inspirée de Red Star OS.
+Première distribution Linux à thème aztèque, basée sur Parrot OS Security — Version 1.0 Beta
 
 ## Installation
 
 ### Étape 1 — Installer l'interface graphique
-```bash
 sudo apt install xorg mate-desktop-environment lightdm -y
 
-###Étape 2 — Démarrer l'interface graphique
+### Étape 2 — Démarrer l'interface graphique
 sudo systemctl start lightdm
 
-###Étape 3 — Connexion
+### Étape 3 — Connexion
 Username : user
 Password : live
 
-###Étape 4 — Cloner le dépôt
+### Étape 4 — Cloner le dépôt
 git clone https://github.com/ralphwdamis-hub/QuetzalOS.git
 
-###Étape 5 — Lancer QuetzalOS
+### Étape 5 — Installer les dépendances
+cd QuetzalOS/olmec-shell
+npm install --timeout=60000
+
+### Étape 6 — Lancer QuetzalOS
+cd ~/QuetzalOS
+git pull origin master
 ~/QuetzalOS/start.sh
 
 ###Basé sur

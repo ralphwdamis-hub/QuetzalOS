@@ -10,7 +10,7 @@
   "author": "QuetzalOS",
   "license": "GPL-3.0",
   "devDependencies": {
-    "electron": "^25.9.8"
+    "electron": "^24.8.8"
   },
   "dependencies": {
     "node-pty": "^1.1.0",

@@ -484,6 +484,7 @@ Aller
 <div id="mtab-prod" onclick="mTab('prod')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold-bright);border-bottom:2px solid var(--gold);background:rgba(26,74,46,.3)">🏪 MARCHÉ</div>
 <div id="mtab-cart" onclick="mTab('cart')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">🧺 PANIER <span id="mcartbadge" style="display:none;background:var(--blood-bright);color:#fff;border-radius:8px;padding:1px 5px;font-size:8px;margin-left:3px">0</span></div>
 <div id="mtab-info" onclick="mTab('info')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📜 HISTOIRE</div>
+<div id="mtab-contact" onclick="mTab('contact')" style="padding:7px 14px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📬 CONTACT</div>
 </div>
 <!-- PANNEAU : MARCHÉ -->
 <div id="mpanel-prod" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px">
@@ -522,6 +523,11 @@ ${[['Superficie','env. 20 000 m²'],['Fréquentation','+ 60 000 / jour'],['Péri
 </div>`).join('')}
 </div>
 </div>
+</div>
+<div id="mpanel-contact" style="flex:1;overflow-y:auto;padding:14px;display:block;background:var(--obsidian);color:var(--text-main);font-family:'IM Fell English',serif">
+  <div style="color:var(--gold-bright);font-family:'Cinzel Decorative',serif;font-size:14px;margin-bottom:12px">📬 Contactez-nous</div>
+  <p style="font-size:12px;line-height:1.7;margin-bottom:10px;color:var(--text-main)">Pour vendre vos produits aztèques ou poser une question :</p>
+  <p style="color:var(--jade-glow);font-size:13px">✉ ralphwdamis@gmail.com</p>
 </div>
 <!-- Taskbar -->
 <div id="taskbar">
@@ -1602,12 +1608,13 @@ this.updateBadge();
 },
 };
 function mTab(tab) {
-['prod','cart','info'].forEach(t => {
+['prod','cart','info','contact'].forEach(t => {
 const panel = document.getElementById('mpanel-'+t);
 const tabEl = document.getElementById('mtab-'+t);
 if (!panel || !tabEl) return;
 const active = t === tab;
 panel.style.display = active ? (t==='prod'?'flex':'block') : 'none';
+if (t==='contact' && active) panel.style.display = 'block';
 tabEl.style.color = active ? 'var(--gold-bright)' : 'var(--text-dim)';
 tabEl.style.borderBottom = active ? '2px solid var(--gold)' : '2px solid transparent';
 tabEl.style.background = active ? 'rgba(26,74,46,.3)' : 'transparent';

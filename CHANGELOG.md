@@ -11,13 +11,32 @@
 - Itzcoatl Browser
 - Milpa Market avec API Flask
 
-## v1.1 Beta — À venir
-### Améliorations prévues
-- Itzcoatl Browser — amélioration vitesse
+# v1.1 Beta — À venir
+
+### Nouvelles applications
+- Itzamná — Traitement de texte
+- Tlaloc — Tableur
+- Xochiquetzal — Présentations
+- Huehueteotl — Base de données
+- Quetzalcóatl Reader — PDF
+- Coatlicue — Visionneuse images/JPG
+- Cipactli — Calculatrice scientifique
+- Teotihuacan Antivirus
+- Xochipilli Player — Média player
+- Pochteca Network — Messagerie
+- Cipactli Cipher — Chiffrement .nah
+- Huehuetl Studio — Musique aztèque
+- Calli USB — Lecture clés USB
+- Mictlan — Corbeille
+
+### Améliorations
+- Dictionnaire nahuatl 500+ mots
+- Grammaire nahuatl
+- Roue solaire améliorée
+- Itzcoatl Browser plus rapide
 - Onglet Contact fonctionnel
-- Icônes manquantes sur le bureau
 - Metasploit intégré
-- Installation simplifiée sans npm install
+- ISO 6-8 GB
 
 ## Contribuer
 Vous souhaitez contribuer à QuetzalOS ?

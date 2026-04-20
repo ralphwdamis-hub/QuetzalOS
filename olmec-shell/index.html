@@ -318,6 +318,7 @@ animation:popIn .3s ease;
 <div class="qtab active" id="qtab-info" onclick="qTab('info')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold-bright);border-bottom:2px solid var(--gold);background:rgba(26,74,46,.3)">🐍 À PROPOS</div>
 <div class="qtab" id="qtab-dict" onclick="qTab('dict')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📖 DICTIONNAIRE</div>
 <div class="qtab" id="qtab-phras" onclick="qTab('phras')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">💬 PHRASES</div>
+<div class="qtab" id="qtab-gram" onclick="qTab('gram')" style="padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text-dim);border-bottom:2px solid transparent">📚 GRAMMAIRE</div>
 </div>
 <!-- Panneau : À PROPOS -->
 <div id="qpanel-info" class="wbody" style="flex:1;overflow-y:auto">
@@ -363,6 +364,66 @@ style="background:rgba(44,36,22,.7);border:1px solid rgba(201,162,39,.25);color:
 <div style="text-align:center;color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:14px">NAHUATL CLASSIQUE</div>
 <div id="phraslist"></div>
 </div>
+</div>
+<!-- Panneau Grammaire -->
+<div id="qpanel-gram" class="wbody" style="flex:1;overflow-y:auto;display:none;padding:12px">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold-bright);text-align:center;margin-bottom:4px;letter-spacing:.1em">📚 Grammaire Nahuatl</div>
+  <div style="text-align:center;color:var(--text-dim);font-size:9px;font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:12px">NAHUATL CLASSIQUE</div>
+
+  <!-- Pronoms -->
+  <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:10px;margin-bottom:10px">
+    <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Pronoms personnels</div>
+    ${[
+      ['Je / Moi','Nehuatl','ne·hua·tl'],
+      ['Tu / Toi','Tehuatl','te·hua·tl'],
+      ['Il / Elle','Yehuatl','ye·hua·tl'],
+      ['Nous','Tehhuantin','teh·huan·tin'],
+      ['Vous','Amehuantin','a·me·huan·tin'],
+      ['Ils / Elles','Yehuantin','ye·huan·tin'],
+    ].map(([fr,nah,pron])=>`
+    <div style="display:flex;gap:10px;padding:4px 0;border-bottom:1px solid rgba(201,162,39,.08);font-size:12px">
+      <span style="color:var(--text-main);min-width:80px;font-family:'IM Fell English',serif">${fr}</span>
+      <span style="color:var(--jade-glow);font-family:'Cinzel',serif;flex:1">${nah}</span>
+      <span style="color:var(--text-dim);font-size:10px;font-family:'Courier New',monospace">[${pron}]</span>
+    </div>`).join('')}
+  </div>
+
+  <!-- Structure de phrase -->
+  <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:10px;margin-bottom:10px">
+    <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Structure de la phrase</div>
+    <p style="color:var(--text-main);font-size:12px;line-height:1.7;font-family:'IM Fell English',serif">En nahuatl, le verbe est au centre de la phrase. Les préfixes indiquent le sujet et l'objet.</p>
+    <div style="background:rgba(0,0,0,.3);padding:8px;border-radius:3px;margin-top:8px;font-family:'Courier New',monospace;font-size:11px">
+      <div style="color:var(--gold)">Ni - c - mati</div>
+      <div style="color:var(--text-dim);font-size:10px">NI (je) + C (le/la) + MATI (savoir) = Je le sais</div>
+    </div>
+  </div>
+
+  <!-- Préfixes -->
+  <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:10px;margin-bottom:10px">
+    <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Préfixes sujet</div>
+    ${[
+      ['Ni-','Je'],
+      ['Ti-','Tu'],
+      ['Ø-','Il/Elle'],
+      ['Ti-','Nous'],
+      ['An-','Vous'],
+      ['Ø-','Ils/Elles'],
+    ].map(([prefix,sens])=>`
+    <div style="display:flex;gap:10px;padding:4px 0;border-bottom:1px solid rgba(201,162,39,.08);font-size:12px">
+      <span style="color:var(--jade-glow);font-family:'Cinzel',serif;min-width:60px">${prefix}</span>
+      <span style="color:var(--text-main);font-family:'IM Fell English',serif">${sens}</span>
+    </div>`).join('')}
+  </div>
+
+  <!-- Négation -->
+  <div style="background:rgba(26,74,46,.15);border:1px solid rgba(201,162,39,.2);border-radius:4px;padding:10px">
+    <div style="color:var(--turquoise-light);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Négation</div>
+    <p style="color:var(--text-main);font-size:12px;line-height:1.7;font-family:'IM Fell English',serif">La négation se forme avec <span style="color:var(--jade-glow)">amo</span> avant le verbe.</p>
+    <div style="background:rgba(0,0,0,.3);padding:8px;border-radius:3px;margin-top:8px;font-family:'Courier New',monospace;font-size:11px">
+      <div style="color:var(--gold)">Amo ni - c - mati</div>
+      <div style="color:var(--text-dim);font-size:10px">AMO (ne pas) + NI (je) + C (le) + MATI (savoir) = Je ne le sais pas</div>
+    </div>
+  </div>
 </div>
 <!-- WINDOW: TENOCHTITLAN FILES -->
 <div class="win" id="wf" style="width:460px;top:90px;left:160px">
@@ -1425,7 +1486,7 @@ function dictFilter(val) {
 DICT.render(val, DICT.activeCat);
 }
 function qTab(tab) {
-['info','dict','phras'].forEach(t => {
+['info','dict','phras','gram'].forEach(t => {
 const panel = document.getElementById('qpanel-'+t);
 const tabEl = document.getElementById('qtab-'+t);
 if (!panel || !tabEl) return;

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metacity_theme>
+
+  <info>
+    <name>QuetzalTheme</name>
+    <author>QuetzalOS</author>
+    <description>Thème aztèque obsidienne pour QuetzalOS</description>
+    <date>2025</date>
+    <version>1.0</version>
+  </info>
+
+  <constant name="TOP_HEIGHT" value="32"/>
+  <constant name="BORDER" value="1"/>
+
+  <frame_geometry name="normal" title_scale="medium" rounded_top_left="3" rounded_top_right="3">
+    <distance name="left_width" value="1"/>
+    <distance name="right_width" value="1"/>
+    <distance name="bottom_height" value="1"/>
+    <distance name="top_height" value="TOP_HEIGHT"/>
+    <distance name="title_vertical_pad" value="4"/>
+    <border name="title_border" top="3" bottom="3" left="6" right="6"/>
+  </frame_geometry>
+
+  <draw_ops name="titlebar_bg">
+    <gradient type="diagonal" x="0" y="0" width="width" height="height">
+      <color value="#1a4a2e"/>
+      <color value="#0a0705"/>
+      <color value="#1a4a2e"/>
+    </gradient>
+    <line color="#c9a227" x1="0" y1="height-1" x2="width" y2="height-1"/>
+  </draw_ops>
+
+  <draw_ops name="titlebar_bg_focused">
+    <gradient type="diagonal" x="0" y="0" width="width" height="height">
+      <color value="#2d7a4f"/>
+      <color value="#0a0705"/>
+      <color value="#2d7a4f"/>
+    </gradient>
+    <line color="#f0c040" x1="0" y1="height-1" x2="width" y2="height-1"/>
+  </draw_ops>
+
+  <frame_style name="normal" geometry="normal">
+    <piece position="titlebar" draw_ops="titlebar_bg"/>
+    <piece position="titlebar_middle" draw_ops="titlebar_bg"/>
+  </frame_style>
+
+  <frame_style name="focused" geometry="normal">
+    <piece position="titlebar" draw_ops="titlebar_bg_focused"/>
+    <piece position="titlebar_middle" draw_ops="titlebar_bg_focused"/>
+  </frame_style>
+
+  <frame_style_set name="normal">
+    <frame focus="yes" state="normal" style="focused"/>
+    <frame focus="no" state="normal" style="normal"/>
+  </frame_style_set>
+
+  <window type="normal" style_set="normal"/>
+  <window type="dialog" style_set="normal"/>
+  <window type="utility" style_set="normal"/>
+
+</metacity_theme>

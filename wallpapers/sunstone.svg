@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <rect width="1920" height="1080" fill="#0a0705"/>
+  <circle cx="960" cy="540" r="480" fill="none" stroke="#c9a227" stroke-width="4"/>
+  <circle cx="960" cy="540" r="380" fill="none" stroke="#c9a227" stroke-width="2"/>
+  <circle cx="960" cy="540" r="280" fill="none" stroke="#1a4a2e" stroke-width="3"/>
+  <circle cx="960" cy="540" r="160" fill="none" stroke="#c9a227" stroke-width="2"/>
+  <circle cx="960" cy="540" r="60" fill="#c9a227" opacity="0.3"/>
+  <line x1="960" y1="60" x2="960" y2="1020" stroke="#c9a227" stroke-width="1" opacity="0.4"/>
+  <line x1="480" y1="540" x2="1440" y2="540" stroke="#c9a227" stroke-width="1" opacity="0.4"/>
+  <line x1="621" y1="201" x2="1299" y2="879" stroke="#1a4a2e" stroke-width="1" opacity="0.4"/>
+  <line x1="1299" y1="201" x2="621" y2="879" stroke="#1a4a2e" stroke-width="1" opacity="0.4"/>
+  <text x="960" y="560" text-anchor="middle" font-size="48" fill="#c9a227" opacity="0.6" font-family="serif">☉</text>
+  <text x="960" y="80" text-anchor="middle" font-size="14" fill="#c9a227" opacity="0.5" font-family="serif" letter-spacing="8">Q U E T Z A L O S</text>
+</svg>

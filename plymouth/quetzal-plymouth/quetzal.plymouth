@@ -1,0 +1,8 @@
+Plymouth Theme]
+Name=QuetzalOS
+Description=Thème de démarrage aztèque — Pierre du Soleil
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/quetzal-plymouth/images
+ScriptFile=/usr/share/plymouth/themes/quetzal-plymouth/quetzal.script

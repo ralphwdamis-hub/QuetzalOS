@@ -1,0 +1,38 @@
+# QuetzalOS — Thème GRUB Aztèque
+
+title-text: ""
+desktop-color: "#0a0705"
+desktop-image: ""
+
++ boot_menu {
+  left = 25%
+  top = 25%
+  width = 50%
+  height = 50%
+  item-font = "Cinzel Regular 14"
+  item-color = "#a09070"
+  selected-item-color = "#f0c040"
+  selected-item-background-color = "#1a4a2e"
+  border-color = "#c9a227"
+  scrollbar = false
+}
+
++ label {
+  top = 10%
+  left = 50%-200
+  width = 400
+  align = "center"
+  font = "Cinzel Regular 24"
+  color = "#c9a227"
+  text = "Q U E T Z A L O S"
+}
+
++ label {
+  top = 16%
+  left = 50%-200
+  width = 400
+  align = "center"
+  font = "Cinzel Regular 12"
+  color = "#3dba76"
+  text = "Serpent a Plumes · Securite Azteque"
+}

@@ -1,0 +1,86 @@
+/* QuetzalTheme — GTK3 — QuetzalOS */
+
+@define-color obsidian #0a0705;
+@define-color jade #1a4a2e;
+@define-color jade_light #2d7a4f;
+@define-color jade_glow #3dba76;
+@define-color gold #c9a227;
+@define-color gold_bright #f0c040;
+@define-color turquoise #00a99d;
+@define-color blood #8b1a1a;
+@define-color text_main #f0e6c8;
+@define-color text_dim #a09070;
+
+* {
+  background-color: @obsidian;
+  color: @text_main;
+  border-color: @gold;
+  font-family: "Cinzel", "Georgia", serif;
+}
+
+window {
+  background-color: @obsidian;
+  color: @text_main;
+}
+
+headerbar {
+  background: linear-gradient(90deg, @jade, #2c2416, @jade);
+  color: @gold_bright;
+  border-bottom: 1px solid @gold;
+}
+
+button {
+  background-color: @jade;
+  color: @gold_bright;
+  border: 1px solid @gold;
+  border-radius: 3px;
+  padding: 4px 10px;
+}
+
+button:hover {
+  background-color: @jade_light;
+  border-color: @jade_glow;
+}
+
+entry {
+  background-color: #040201;
+  color: @text_main;
+  border: 1px solid @gold;
+  border-radius: 3px;
+}
+
+menubar {
+  background-color: @jade;
+  color: @gold_bright;
+  border-bottom: 1px solid @gold;
+}
+
+menu {
+  background-color: #0e0a06;
+  color: @text_main;
+  border: 1px solid @gold;
+}
+
+menuitem:hover {
+  background-color: @jade;
+  color: @gold_bright;
+}
+
+treeview {
+  background-color: #0d1208;
+  color: @text_main;
+}
+
+treeview:selected {
+  background-color: @jade;
+  color: @gold_bright;
+}
+
+scrollbar {
+  background-color: @obsidian;
+}
+
+scrollbar slider {
+  background-color: @gold;
+  border-radius: 3px;
+}
